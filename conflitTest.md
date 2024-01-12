@@ -1,2 +1,3 @@
 Instruction #3
-Merge Conflict : VS Code
+
+Merge Conflict Resolution : Github & VS Code
