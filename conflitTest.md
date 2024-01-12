@@ -1,1 +1,2 @@
-Instruction #2
+Instruction #3
+Merge Conflict : Github
