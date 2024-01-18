@@ -30,9 +30,13 @@ Technologies used:
   - Used for styling pages
 - Javascript
   - Used for setting up interatibility of pages
+- Web service
+  - Calls database to get messages
 - Authentification
   - Used for accounts
 - Database
   - Used for keeping messages
 - WebSocket
   - Used for messaging service
+- Web framework
+  - React for components
