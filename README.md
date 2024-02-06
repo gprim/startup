@@ -40,3 +40,27 @@ Technologies used:
   - Used for messaging service
 - Web framework
   - React for components
+
+### Startup HTML
+
+HTML pages:
+ - 5 pages to login, create accounts, message other users, and play games
+
+Links:
+ - All pages link to each other, as well as both the login and create account pages linking to each other as appropriate
+
+Text:
+ - Games page has a placeholder for where the games will go
+ - Message page has a placeholder for a list of other users to message and messages received
+
+Images:
+ - Games have images next to them for their icon
+
+Placeholder for 3rd party calls:
+ - Create Account has an email input for their account, and it will call a 3rd party to check their email
+
+DB/Login:
+ - Login and create account page, as well as messages saved in the DB
+
+Websocket:
+ - Messages received and sent in real time
