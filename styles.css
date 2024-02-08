@@ -1,4 +1,25 @@
-header {
+body {
     display: flex;
-    
+    flex-direction: column;
+    margin: 0;
+    height: 100vh;
+}
+
+header {
+    flex: 0 50px;
+    display: flex;
+}
+
+main {
+    flex: 1;
+}
+
+footer {
+    flex: 0 50px;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: left;
 }
