@@ -1,21 +1,45 @@
+:root {
+    --secondary-bg-color: darkslategrey;
+    --primary-bg-color: grey;
+}
+
+
 body {
     display: flex;
     flex-direction: column;
     margin: 0;
     height: 100vh;
+    background-color: var(--primary-bg-color);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
 header {
     flex: 0 50px;
+    background-color: var(--secondary-bg-color);
     display: flex;
+    align-items: center;
+    padding-left: 50px;
 }
 
 main {
     flex: 1;
+    display: flex;
+    align-items: center;
+    padding-top: 50px;
+    flex-direction: column;
 }
 
 footer {
     flex: 0 50px;
+    border-top: 1px solid darkslategray;
+    background-color: var(--secondary-bg-color);
+    display: flex;
+    align-items: center;
+    padding-right: 50px;
 }
 
 nav {
