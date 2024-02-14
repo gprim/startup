@@ -85,3 +85,12 @@ menu {
     padding: 0;
     margin: 0;
 }
+
+@media (max-height: 360px) {
+    header {
+        display: none;
+    }
+    footer {
+        display: none;
+    }
+}
