@@ -64,3 +64,24 @@ DB/Login:
 
 Websocket:
  - Messages received and sent in real time
+
+ ### Startup CSS
+
+Header, Footer, and Main content body
+ - Stylized!
+
+Navigation Elements
+ - Changed most anchor tags to be enclosed in buttons, which now have style as well.
+ - Anchor tags lost their blue color and underlines.
+
+Responsive to window resizing
+ - The header and footer will disappear if the page goes under 360px
+
+Application elements
+ - Tried a darktheme, and it looks alright. I'm not a good guy with colors, but it works for now.
+
+Application text content
+ - I have standarized colors for both fonts and backgrounds.
+
+Application images
+ - I have some images, and all I did was put them where they needed to be.
