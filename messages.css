@@ -1,0 +1,62 @@
+main {
+    flex-direction: row;
+    padding: 0;
+}
+
+.friend-list {
+    flex: 0 205px;
+    display: flex;
+    background-color: var(--secondary-bg-color);
+    height: 100%;
+    border: 1px solid var(--secondary-border-color);
+    border-left: none;
+
+    menu {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        font-size: large;
+    }
+}
+
+.messages-container {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
+    flex: 1;
+    background-color: var(--secondary-bg-color);
+
+    div {
+        display: flex;
+
+        * {
+            background-color: var(--primary-bg-color);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: large;
+        }
+    }
+
+    div.received {
+        justify-content: flex-start;
+    }
+
+    div.sent {
+        justify-content: flex-end;
+    }
+}
+
+.message-input-container {
+    flex: 0 5%;
+    padding: 20px;
+    display: flex;
+
+    * {
+        flex: 1;
+        border-radius: 5px;;
+    }
+}

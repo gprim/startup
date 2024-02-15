@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="messages.css">
     <title>Cazi Games</title>
 </head>
 <body>
@@ -21,18 +22,22 @@
     </header>
 
     <main>
-        <section>
+        <section class="friend-list">
             <menu>
                 <lu><a href="messages.html">Karlie</a></lu>
                 <lu><a href="messages.html">Aaron</a></lu>
                 <lu><a href="messages.html">Michael</a></lu>
             </menu>
         </section>
-        <section>
+        <section class="messages-container">
             <h2>Messages</h2>
-            <p>Hey wassup?</p>
-            <p>Nothin much wbu?</p>
-            <input type="text" placeholder="Type message here" />
+            <section class="messages">
+                <div class="received"><p>Hey wassup?</p></div>
+                <div class="sent"><p>Nothin much wbu?</p></div>
+            </section>
+            <div class="message-input-container">
+                <input type="text" placeholder="Type message here" />
+            </div>
         </section>
     </main>
     
