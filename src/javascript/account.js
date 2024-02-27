@@ -1,54 +1,60 @@
-const getFromLocalStorage = (key, defaultValue={}) => {
-    let value = localStorage.getItem(key);
+const getFromLocalStorage = (key, defaultValue = {}) => {
+  let value = localStorage.getItem(key);
 
-    if (!value) value = defaultValue;
-    else value = JSON.parse(value);
+  if (!value) value = defaultValue;
+  else value = JSON.parse(value);
 
-    return value;
-}
+  return value;
+};
 
 const storeOnLocalStorage = (key, value) => {
-    localStorage.setItem(key, JSON.stringify(value));
-}
+  localStorage.setItem(key, JSON.stringify(value));
+};
 
 const getAccounts = () => {
-    return getFromLocalStorage("accounts");
-}
+  return getFromLocalStorage("accounts");
+};
 
 const getTokens = () => {
-    return getFromLocalStorage("tokens");
-}
+  return getFromLocalStorage("tokens");
+};
 
 const storeAccounts = (accounts) => {
-    storeOnLocalStorage("accounts", accounts);
-}
+  storeOnLocalStorage("accounts", accounts);
+};
 
 const storeTokens = (tokens) => {
-    storeOnLocalStorage("tokens", tokens);
-}
+  storeOnLocalStorage("tokens", tokens);
+};
 
-export const createAccount = (username, password) => {
-    const accounts = getAccounts();
+const authenticateUser = (user) => {
+  const tokens = getTokens();
 
-    if (accounts[username]) throw new Error("Account already exists!");
+  const token = crypto.randomUUID();
 
-    accounts[username] = password;
+  tokens[token] = user.username;
+  storeTokens(tokens);
 
-    storeAccounts(accounts);
-}
+  return token;
+};
+
+export const createAccount = (email, username, password) => {
+  const accounts = getAccounts();
+
+  if (accounts[username]) throw new Error("Account already exists!");
+
+  accounts[username] = { email, username, password };
+
+  storeAccounts(accounts);
+
+  return authenticateUser(accounts[username]);
+};
 
 export const login = (username, password) => {
-    const accounts = getAccounts();
+  const accounts = getAccounts();
 
-    if (!accounts[username] || accounts[username] !== password) return undefined;
+  if (!accounts[username] || accounts[username].password !== password)
+    return undefined;
 
-    const tokens = getTokens();
-
-    const token = crypto.randomUUID();
-
-    tokens[token] = username;
-    storeTokens(tokens);
-
-    return token;
-}
-
+  return authenticateUser(accounts[username]);
+};

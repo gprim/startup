@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/styles.css">
+    <script defer type="module" src="../javascript/createAccount.js""></script>
     <title>Cazi Games</title>
 </head>
 <body>
@@ -21,13 +22,13 @@
     </header>
 
     <main>
-        <form class="session-form" method="get" action="index.html">
+        <form id="create-account-form" class="session-form" method="get" action="index.html">
             <label for="email">Email</label>
-            <input type="email" id="email" required placeholder="Email" />
+            <input type="email" name="email" id="email" required placeholder="Email" />
             <label for="username">Username</label>
-            <input type="text" id="username" required placeholder="Username" />
+            <input type="text" name="username" id="username" required placeholder="Username" />
             <label for="password">Password</label>
-            <input type="password" id="password" required placeholder="Password" />
+            <input type="password" name="password" id="password" required placeholder="Password" />
             <button class="link-btn" type="submit">Login</button>
         </form>
         <p>Already have an account? <button class="link-btn" type="button"><a href="login.html">Login</a></button></p>
