@@ -25,4 +25,6 @@ loginForm.addEventListener("submit", (e) => {
     alert("Incorrect login!");
     return;
   }
+
+  window.location.href = window.location.origin;
 });

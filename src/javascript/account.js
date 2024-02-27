@@ -19,12 +19,28 @@ const getTokens = () => {
   return getFromLocalStorage("tokens");
 };
 
+export const getCurrentToken = () => {
+  return localStorage.getItem("currentToken") || undefined;
+};
+
+export const getCurrentUser = () => {
+  return getFromLocalStorage("currentUser", null);
+};
+
 const storeAccounts = (accounts) => {
   storeOnLocalStorage("accounts", accounts);
 };
 
 const storeTokens = (tokens) => {
   storeOnLocalStorage("tokens", tokens);
+};
+
+const storeCurrentToken = (token) => {
+  localStorage.setItem("currentToken", token);
+};
+
+const storeCurrentUser = (user) => {
+  storeOnLocalStorage("currentUser", { ...user, password: undefined });
 };
 
 const authenticateUser = (user) => {
@@ -34,6 +50,10 @@ const authenticateUser = (user) => {
 
   tokens[token] = user.username;
   storeTokens(tokens);
+
+  storeCurrentToken(token);
+
+  storeCurrentUser(user);
 
   return token;
 };

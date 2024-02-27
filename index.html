@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="src/css/styles.css">
+    <script defer type="module" src="src/javascript/home.js"></script>
     <title>Cazi Games</title>
 </head>
 <body>
@@ -22,12 +23,23 @@
 
     <main>
         <h1>Welcome to Cazi-Games!</h1>
-        <p>Login to play and message!</p>
-        <button class="link-btn" type="button">
-            <a href="src/html/login.html">Login</a>
-        </button>
-        
-        <p>Don't have an account? <button class="link-btn" type="button"><a href="src/html/create-account.html"">Create Account</a></button></p>
+        <div id="not-logged-in" style="display:none">
+            <p>Login to play and message!</p>
+            <button class="link-btn" type="button">
+                <a href="src/html/login.html">Login</a>
+            </button>
+            
+            <p>Don't have an account? <button class="link-btn" type="button"><a href="src/html/create-account.html"">Create Account</a></button></p>
+        </div>
+        <div id="logged-in" style="display:none">
+            <p id="welcome-user">Welcome {user}!</p>
+            <button class="link-btn" type="button">
+                <a href="src/html/messages.html">Check Messages</a>
+            </button>
+            <button class="link-btn" type="button">
+                <a href="src/html/games.html">Games</a>
+            </button>
+        </div>
     </main>
     
     <footer>
