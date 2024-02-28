@@ -1,4 +1,4 @@
-const getFromLocalStorage = (key, defaultValue = {}) => {
+export const getFromLocalStorage = (key, defaultValue = {}) => {
   let value = localStorage.getItem(key);
 
   if (!value) value = defaultValue;
@@ -7,7 +7,7 @@ const getFromLocalStorage = (key, defaultValue = {}) => {
   return value;
 };
 
-const storeOnLocalStorage = (key, value) => {
+export const storeOnLocalStorage = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
