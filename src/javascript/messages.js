@@ -65,7 +65,22 @@ const displayMessages = () => {
 
 (() => {
   const sendMessageInput = document.getElementById("message-input");
+  const messageContainer = document.getElementById("messages");
   const user = getCurrentUser();
+
+  setCurrentFriend("Aaron");
+
+  const setMaxSizeOfMessageContainer = () => {
+    while (messageContainer.firstChild)
+      messageContainer.removeChild(messageContainer.lastChild);
+    const parentHeight = Math.floor(
+      messageContainer.parentElement.getBoundingClientRect().height - 1
+    );
+
+    messageContainer.style.maxHeight = `${parentHeight}px`;
+
+    displayMessages();
+  };
 
   if (!user) {
     const errorMessage = document.createElement("div");
@@ -75,9 +90,9 @@ const displayMessages = () => {
     return;
   }
 
-  setCurrentFriend("Aaron");
+  setMaxSizeOfMessageContainer();
 
-  displayMessages();
+  window.addEventListener("resize", setMaxSizeOfMessageContainer);
 
   sendMessageInput.addEventListener("keydown", (e) => {
     if (e.keyCode !== 13 || !e.target.value) return;
