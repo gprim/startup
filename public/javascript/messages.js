@@ -68,7 +68,7 @@ const displayMessages = () => {
   const messageContainer = document.getElementById("messages");
   const user = getCurrentUser();
 
-  setCurrentFriend("Aaron");
+  if (user) setCurrentFriend("Aaron");
 
   const setMaxSizeOfMessageContainer = () => {
     while (messageContainer.firstChild)
