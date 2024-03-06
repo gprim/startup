@@ -10,7 +10,7 @@
     "start-prod": "node server.js --isDev=false",
     "build": "tsc -p tsconfig.build.json",
     "bundle": "ts-node bundle.ts",
-    "deploy-prod": "npm run bundle;cp -r output ../;cd ../output;npm i;npm run start-prod"
+    "deploy-prod": "npm run bundle;cd output;npm i;npm run start-prod"
   },
   "dependencies": {
     "express": "^4.18.3"
