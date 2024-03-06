@@ -25,9 +25,7 @@ const OUTPUT_LOCATION = join(__dirname, "output");
 
   // Step 3: Copy the build artifacts to the output directory
   await fs.copyFile("package.json", join(OUTPUT_LOCATION, "package.json"));
+  await fs.copyFile(".env", join(OUTPUT_LOCATION, ".env"));
   await fs.cp("build", OUTPUT_LOCATION, { recursive: true });
   await fs.cp("public", join(OUTPUT_LOCATION, "public"), { recursive: true });
-
-  // Step 4: Perform and find and replace variable value substitutions
-  const filePath = join(OUTPUT_LOCATION, "appsettings.js");
 })();

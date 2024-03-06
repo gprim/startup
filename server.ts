@@ -36,17 +36,13 @@ type MiddleWare = (
   const isProd = process.env.NODE_ENV === "prod";
 
   const app = express();
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 4000;
 
   app.use(express.static("public"));
   app.use(express.json());
 
-  const middlewareWrapper = (middleware: MiddleWare) => {
-    return (
-      req: express.Request,
-      res: express.Response,
-      next: express.NextFunction
-    ) => {
+  const middlewareWrapper = (middleware: MiddleWare): MiddleWare => {
+    return (req, res, next) => {
       const whitelist = ["/", "/bundle.js", "/favicon.ico"];
       if (whitelist.includes(req.originalUrl)) return next();
       return middleware(req, res, next);
@@ -56,7 +52,6 @@ type MiddleWare = (
   const authMiddleware: MiddleWare = (req, res, next) => {
     if (!tokens[req.headers.authorization]) {
       res.sendStatus(400);
-      console.log("here");
       return;
     }
 
@@ -64,11 +59,6 @@ type MiddleWare = (
   };
 
   app.use(middlewareWrapper(authMiddleware));
-  if (!isProd) {
-  } else {
-    const distDir: string = path.join(__dirname, "dist");
-    app.use(express.static(distDir));
-  }
 
   app.get("*", (_req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
