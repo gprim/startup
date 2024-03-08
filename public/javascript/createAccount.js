@@ -2,7 +2,7 @@ import { createAccount } from "./account.js";
 
 const loginForm = document.getElementById("create-account-form");
 
-loginForm.addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = new FormData(e.target);
 
@@ -25,7 +25,7 @@ loginForm.addEventListener("submit", (e) => {
   let token;
 
   try {
-    token = createAccount(email, username, password);
+    token = await createAccount(email, username, password);
   } catch (err) {
     alert(err.message);
     return;

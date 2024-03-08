@@ -19,11 +19,6 @@ const storeMessages = (messages) => {
   storeOnLocalStorage(`${user.username}-messages`, messages);
 };
 
-const getFriends = () => {
-  const user = getCurrentUser();
-  return getFromLocalStorage(`${user.username}-friends`);
-};
-
 const setCurrentFriend = (friend) => {
   const user = getCurrentUser();
   storeOnLocalStorage(`${user.username}-current-friend`, friend);
@@ -40,7 +35,7 @@ const updateMessages = (friend, message) => {
   displayMessages();
 };
 
-const createMessageElement = ({ text, from, timestamp }, user) => {
+const createMessageElement = ({ text, from }, user) => {
   const messageDivContainer = document.createElement("div");
   messageDivContainer.className = from === user.username ? "sent" : "recieved";
   const p = document.createElement("p");
@@ -74,7 +69,7 @@ const displayMessages = () => {
     while (messageContainer.firstChild)
       messageContainer.removeChild(messageContainer.lastChild);
     const parentHeight = Math.floor(
-      messageContainer.parentElement.getBoundingClientRect().height - 1
+      messageContainer.parentElement.getBoundingClientRect().height - 1,
     );
 
     messageContainer.style.maxHeight = `${parentHeight}px`;

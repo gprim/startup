@@ -1,3 +1,5 @@
+import { post, put } from "./api.js";
+
 export const getFromLocalStorage = (key, defaultValue = {}) => {
   let value = localStorage.getItem(key);
 
@@ -11,28 +13,12 @@ export const storeOnLocalStorage = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
-const getAccounts = () => {
-  return getFromLocalStorage("accounts");
-};
-
-const getTokens = () => {
-  return getFromLocalStorage("tokens");
-};
-
 export const getCurrentToken = () => {
   return localStorage.getItem("currentToken") || undefined;
 };
 
 export const getCurrentUser = () => {
   return getFromLocalStorage("currentUser", null);
-};
-
-const storeAccounts = (accounts) => {
-  storeOnLocalStorage("accounts", accounts);
-};
-
-const storeTokens = (tokens) => {
-  storeOnLocalStorage("tokens", tokens);
 };
 
 const storeCurrentToken = (token) => {
@@ -43,14 +29,7 @@ const storeCurrentUser = (user) => {
   storeOnLocalStorage("currentUser", { ...user, password: undefined });
 };
 
-const authenticateUser = (user) => {
-  const tokens = getTokens();
-
-  const token = crypto.randomUUID();
-
-  tokens[token] = user.username;
-  storeTokens(tokens);
-
+const authenticateUser = (user, token) => {
   storeCurrentToken(token);
 
   storeCurrentUser(user);
@@ -58,23 +37,30 @@ const authenticateUser = (user) => {
   return token;
 };
 
-export const createAccount = (email, username, password) => {
-  const accounts = getAccounts();
+export const createAccount = async (email, username, password) => {
+  const user = { email, username, password };
 
-  if (accounts[username]) throw new Error("Account already exists!");
+  let response;
 
-  accounts[username] = { email, username, password };
+  try {
+    response = await post("../api/auth", user);
+  } catch (ex) {
+    alert(ex.message);
+  }
 
-  storeAccounts(accounts);
-
-  return authenticateUser(accounts[username]);
+  return authenticateUser(user, response);
 };
 
-export const login = (username, password) => {
-  const accounts = getAccounts();
+export const login = async (username, password) => {
+  const user = { username, password };
 
-  if (!accounts[username] || accounts[username].password !== password)
-    return undefined;
+  let response;
 
-  return authenticateUser(accounts[username]);
+  try {
+    response = await put("../api/auth", user);
+  } catch (ex) {
+    alert(ex.message);
+  }
+
+  return authenticateUser(user, response);
 };
