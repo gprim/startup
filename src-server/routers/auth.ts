@@ -13,8 +13,8 @@ auth.get("/", (req, res) => {
   const token = req.headers.authorization;
 
   if (!Users.getInstance().verifyToken(token))
-    res.send(StatusCodes.UNAUTHORIZED);
-  else res.send(StatusCodes.OK);
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+  else res.sendStatus(StatusCodes.OK);
 });
 
 // create an account, return auth token

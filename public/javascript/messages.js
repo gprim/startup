@@ -122,6 +122,8 @@ const getRandomJoke = async () => {
       if (joke) e.target.value = joke;
     }
 
+    if (!currentFriend) currentFriend = user.username;
+
     const response = await post(
       `/api/messages/convo/${currentFriend}`,
       { text: e.target.value },
@@ -134,5 +136,7 @@ const getRandomJoke = async () => {
       alert("Something went wrong");
       return;
     }
+
+    swapCurrentConvo(currentFriend);
   });
 })();
