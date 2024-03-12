@@ -118,3 +118,13 @@ WebSocket
 Application logic
 
 - If a user isn't logged in, then it will display some things such as not letting them send messages because they need to be logged in.
+
+### Service delierable
+
+ - Node.js/Express HTTP service: Done!
+ - Static middleware for frontend: Done!
+ - Calls to 3rd party: Done! When user types: "joke" and sends it to another user in messages, it will send a random joke.
+ - Backend service endpoints: Auth and messaging done
+ - Frontend calls service endpoints: Calls to auth and messages, and 3rd party joke service.
+
+Also, decided to change and focus exclusively on the messaging service. Games would be too hard right now, and for now the games tab can serve like a curated list of games to play. Messaging is plenty hard and still hits all requirements.
