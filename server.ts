@@ -2,6 +2,8 @@ import * as express from "express";
 import * as path from "node:path";
 import { api } from "./src-server";
 import type { MiddleWare } from "./src-server";
+import { Users } from "./src-server/authorization";
+import { StatusCodes } from "./src-server/routers";
 
 (async () => {
   const app = express();
@@ -12,17 +14,18 @@ import type { MiddleWare } from "./src-server";
 
   const middlewareWrapper = (middleware: MiddleWare): MiddleWare => {
     return (req, res, next) => {
-      const whitelist = ["/", "/bundle.js", "/favicon.ico"];
+      const whitelist = ["/", "/bundle.js", "/favicon.ico", "/api/auth"];
       if (whitelist.includes(req.originalUrl)) return next();
       return middleware(req, res, next);
     };
   };
 
   const authMiddleware: MiddleWare = (req, res, next) => {
-    // if (false) {
-    // 	res.sendStatus(400);
-    // 	return;
-    // }
+    const token = req.headers.authorization;
+    if (!token || !Users.getInstance().verifyToken(token)) {
+      res.sendStatus(StatusCodes.UNAUTHORIZED);
+      return;
+    }
 
     return next();
   };

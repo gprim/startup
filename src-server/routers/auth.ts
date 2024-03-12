@@ -1,29 +1,37 @@
 import * as express from "express";
-import * as crypto from "node:crypto";
-import { User } from "../authorization";
+import { User, Users } from "../authorization";
 import { StatusCodes } from "./ApiTypes";
 
 export const auth = express.Router();
 
-const users: Record<string, User> = {};
-const tokens: Record<string, string> = {};
-
 const newToken = (user: User) => {
-  const token = crypto.randomUUID();
-  tokens[token] = user.username;
+  const token = Users.getInstance().createToken(user.username);
   return token;
 };
+
+auth.get("/", (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!Users.getInstance().verifyToken(token))
+    res.send(StatusCodes.UNAUTHORIZED);
+  else res.send(StatusCodes.OK);
+});
 
 // create an account, return auth token
 auth.post("/", (req, res) => {
   const user = req.body as User;
 
-  if (!user.username || !user.password || !user.email || users[user.username]) {
+  if (!user.username || !user.password || !user.email) {
     res.sendStatus(StatusCodes.BAD_REQUEST);
     return;
   }
 
-  users[user.username] = user;
+  if (Users.getInstance().getUser(user.username)) {
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+    return;
+  }
+
+  Users.getInstance().addUser(user);
 
   res.send(newToken(user));
 });
@@ -37,9 +45,11 @@ auth.put("/", (req, res) => {
     return;
   }
 
+  const userStore = Users.getInstance();
+
   if (
-    !users[user.username] ||
-    users[user.username].password !== user.password
+    !userStore.getUser(user.username) ||
+    userStore.getUser(user.username).password !== user.password
   ) {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
     return;
@@ -52,7 +62,12 @@ auth.put("/", (req, res) => {
 auth.delete("/", (req, res) => {
   const token = req.headers.authorization;
 
-  if (tokens[token]) delete tokens[token];
+  if (!Users.getInstance().verifyToken(token)) {
+    res.sendStatus(StatusCodes.UNAUTHORIZED);
+    return;
+  }
+
+  Users.getInstance().deleteToken(token);
 
   res.sendStatus(StatusCodes.OK);
 });

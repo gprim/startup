@@ -31,10 +31,7 @@ loginForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  if (!token) {
-    alert("Incorrect login!");
-    return;
-  }
+  if (!token) return;
 
   window.location.href = window.location.origin;
 });

@@ -2,8 +2,6 @@ import { getCurrentUser } from "./account.js";
 
 const user = getCurrentUser();
 
-console.log(user);
-
 const loggedInContent = document.getElementById("logged-in");
 const notLoggedInContent = document.getElementById("not-logged-in");
 

@@ -10,12 +10,26 @@ main {
   height: 100%;
   border: 1px solid var(--secondary-border-color);
   border-left: none;
+  flex-direction: column;
+
+  > input {
+    height: 30px;
+  }
 
   menu {
     flex: 1;
     display: flex;
     flex-direction: column;
     font-size: large;
+
+    > ul {
+      margin: 0;
+      cursor: pointer;
+       
+      > p {
+        margin: 0;
+      }
+    }
   }
 }
 

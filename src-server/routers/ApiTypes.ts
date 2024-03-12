@@ -9,6 +9,7 @@ export type MiddleWare = (
 export const enum StatusCodes {
   OK = 200,
   BAD_REQUEST = 400,
-  UNAUTHORIZED = 403,
+  UNAUTHORIZED = 401,
+  FORBIDDEN = 403,
   SERVER_ERROR = 500,
 }

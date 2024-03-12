@@ -18,7 +18,7 @@ const apiCall = async (
   fetchOptions = undefined,
 ) => {
   if (!headers) headers = defaultHeaders;
-  else headers = { ...defaultHeaders, headers };
+  else headers = { ...defaultHeaders, ...headers };
   if (!fetchOptions) fetchOptions = defaultFetchOptions;
   else fetchOptions = { ...defaultFetchOptions, fetchOptions };
 
@@ -35,16 +35,15 @@ const apiCall = async (
     body: data,
   });
 
-  switch (response.headers["Content-Type"]) {
-    case "application/json":
-      return response.json();
-    default:
-      return response.text();
-  }
+  return response;
 };
 
 export const post = async (url, data, headers = undefined) => {
   return apiCall("POST", url, data, headers);
+};
+
+export const get = async (url, headers = undefined) => {
+  return apiCall("GET", url, undefined, headers);
 };
 
 export const put = async (url, data, headers = undefined) => {

@@ -2,7 +2,7 @@ import { login } from "./account.js";
 
 const loginForm = document.getElementById("login-form");
 
-loginForm.addEventListener("submit", (e) => {
+loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const form = new FormData(e.target);
 
@@ -19,12 +19,9 @@ loginForm.addEventListener("submit", (e) => {
     }
   }
 
-  const token = login(username, password);
+  const token = await login(username, password);
 
-  if (!token) {
-    alert("Incorrect login!");
-    return;
-  }
+  if (!token) return;
 
   window.location.href = window.location.origin;
 });
