@@ -33,6 +33,7 @@ scp -r -i "$key" "$NODE_SERVER_FOLDER" ubuntu@$hostname:services/$service
 # Step 3
 printf "\n----> Turn on the server.\n"
 ssh -i "$key" ubuntu@$hostname << ENDSSH
+bash -i
 cd services/${service}
 mv output/package.json ./
 npm i --omit=dev
