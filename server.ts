@@ -4,12 +4,16 @@ import * as path from "node:path";
 import * as cookieParser from "cookie-parser";
 import { api } from "./src-server";
 import type { MiddleWare } from "./src-server";
-import { Users } from "./src-server/authorization";
 import { StatusCodes } from "./src-server/routers";
+import { UsersDao } from "./src-server/dao";
+import { UsersMemoryDao } from "./src-server/dao/memory-dao/UsersMemoryDao";
+import { TokensMemoryDao } from "./src-server/dao/memory-dao/TokensMemoryDao";
 
 (async () => {
   const app = express();
   const port = process.env.PORT || 4000;
+
+  new UsersDao(new UsersMemoryDao(), new TokensMemoryDao());
 
   app.use(express.static("public"));
   app.use(express.json());
@@ -23,9 +27,9 @@ import { StatusCodes } from "./src-server/routers";
     };
   };
 
-  const authMiddleware: MiddleWare = (req, res, next) => {
+  const authMiddleware: MiddleWare = async (req, res, next) => {
     const token = req.cookies?.authorization;
-    if (!token || !Users.getInstance().verifyToken(token)) {
+    if (!token || !(await UsersDao.getInstance().verifyToken(token))) {
       res.sendStatus(StatusCodes.UNAUTHORIZED);
       return;
     }

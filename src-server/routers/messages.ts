@@ -52,5 +52,5 @@ messages.post("/convo/:username", async (req, res) => {
 });
 
 messages.get("/users/:search", async (req, res) => {
-  res.send(UsersDao.getInstance().getUsernames(req.params.search));
+  res.send(await UsersDao.getInstance().getUsernames(req.params.search));
 });

@@ -30,6 +30,8 @@ export class UsersDao {
     const token = crypto.randomUUID();
 
     await this.tokensDao.addItem({ token, username });
+
+    return token;
   }
 
   async verifyToken(token: string) {
