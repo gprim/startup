@@ -1,5 +1,7 @@
+import "dotenv/config";
 import * as express from "express";
 import * as path from "node:path";
+import * as cookieParser from "cookie-parser";
 import { api } from "./src-server";
 import type { MiddleWare } from "./src-server";
 import { Users } from "./src-server/authorization";
@@ -11,6 +13,7 @@ import { StatusCodes } from "./src-server/routers";
 
   app.use(express.static("public"));
   app.use(express.json());
+  app.use(cookieParser());
 
   const middlewareWrapper = (middleware: MiddleWare): MiddleWare => {
     return (req, res, next) => {
@@ -21,7 +24,7 @@ import { StatusCodes } from "./src-server/routers";
   };
 
   const authMiddleware: MiddleWare = (req, res, next) => {
-    const token = req.headers.authorization;
+    const token = req.cookies?.authorization;
     if (!token || !Users.getInstance().verifyToken(token)) {
       res.sendStatus(StatusCodes.UNAUTHORIZED);
       return;
@@ -38,6 +41,5 @@ import { StatusCodes } from "./src-server/routers";
 
   app.use("/api", api);
 
-  console.log(`Listening on port ${port}`);
-  app.listen(port);
+  app.listen(port, () => console.log(`Listening on port ${port}`));
 })();

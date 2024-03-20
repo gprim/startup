@@ -1,4 +1,4 @@
-import { getCurrentUser, getCurrentToken } from "./account.js";
+import { getCurrentUser } from "./account.js";
 import { get, post } from "./api.js";
 
 const createMessageElement = ({ text, from }, user) => {
@@ -25,10 +25,7 @@ const displayMessages = (messages) => {
 };
 
 const swapCurrentConvo = async (username) => {
-  const token = getCurrentToken();
-  const response = await get(`/api/messages/convo/${username}`, {
-    authorization: token,
-  });
+  const response = await get(`/api/messages/convo/${username}`);
 
   if (!response.ok) {
     alert("Something went wrong");
@@ -49,11 +46,8 @@ friendsSearchInput.addEventListener("keydown", async (e) => {
   if (e.keyCode !== 13 || !e.target.value) return;
 
   friendsList.innerHTML = "";
-  const token = getCurrentToken();
 
-  const response = await get(`/api/messages/users/${e.target.value}`, {
-    authorization: token,
-  });
+  const response = await get(`/api/messages/users/${e.target.value}`);
 
   if (!response.ok) {
     alert("An error occured");
@@ -88,7 +82,6 @@ const getRandomJoke = async () => {
   const sendMessageInput = document.getElementById("message-input");
   const messageContainer = document.getElementById("messages");
   const user = getCurrentUser();
-  const token = getCurrentToken();
 
   const setMaxSizeOfMessageContainer = () => {
     while (messageContainer.firstChild)
@@ -124,11 +117,9 @@ const getRandomJoke = async () => {
 
     if (!currentFriend) currentFriend = user.username;
 
-    const response = await post(
-      `/api/messages/convo/${currentFriend}`,
-      { text: e.target.value },
-      { authorization: token },
-    );
+    const response = await post(`/api/messages/convo/${currentFriend}`, {
+      text: e.target.value,
+    });
 
     e.target.value = "";
 

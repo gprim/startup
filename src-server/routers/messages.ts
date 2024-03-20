@@ -27,7 +27,7 @@ const getMessages = (user1: User, user2: User) => {
 };
 
 messages.get("/convo/:username", (req, res) => {
-  const token = req.headers.authorization;
+  const token = req.cookies.authorization;
 
   const user1 = Users.getInstance().getUserFromToken(token);
   const user2 = Users.getInstance().getUser(req.params.username);
@@ -36,7 +36,7 @@ messages.get("/convo/:username", (req, res) => {
 });
 
 messages.post("/convo/:username", (req, res) => {
-  const token = req.headers.authorization;
+  const token = req.cookies.authorization;
 
   if (!req.body || !req.body.text) {
     res.sendStatus(StatusCodes.BAD_REQUEST);

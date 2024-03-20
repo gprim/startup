@@ -19,9 +19,12 @@ loginForm.addEventListener("submit", async (e) => {
     }
   }
 
-  const token = await login(username, password);
-
-  if (!token) return;
+  try {
+    await login(username, password);
+  } catch (err) {
+    console.log(err);
+    return;
+  }
 
   window.location.href = window.location.origin;
 });

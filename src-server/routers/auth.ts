@@ -4,13 +4,18 @@ import { StatusCodes } from "./ApiTypes";
 
 export const auth = express.Router();
 
-const newToken = (user: User) => {
+const newToken = (user: User, res: express.Response) => {
   const token = Users.getInstance().createToken(user.username);
-  return token;
+
+  res.cookie("authorization", token, {
+    secure: true,
+    httpOnly: true,
+    sameSite: "strict",
+  });
 };
 
 auth.get("/", (req, res) => {
-  const token = req.headers.authorization;
+  const token = req.cookies?.authorization;
 
   if (!Users.getInstance().verifyToken(token))
     res.sendStatus(StatusCodes.UNAUTHORIZED);
@@ -33,7 +38,9 @@ auth.post("/", (req, res) => {
 
   Users.getInstance().addUser(user);
 
-  res.send(newToken(user));
+  newToken(user, res);
+
+  res.sendStatus(StatusCodes.OK);
 });
 
 // login account, return auth token
@@ -55,12 +62,14 @@ auth.put("/", (req, res) => {
     return;
   }
 
-  res.send(newToken(user));
+  newToken(user, res);
+
+  res.sendStatus(StatusCodes.OK);
 });
 
 // logout auth token
 auth.delete("/", (req, res) => {
-  const token = req.headers.authorization;
+  const token = req.cookies?.authorization;
 
   if (!Users.getInstance().verifyToken(token)) {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
