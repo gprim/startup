@@ -1,6 +1,7 @@
 import * as express from "express";
-import { User, Users } from "../authorization";
+import type { User } from "../authorization";
 import { StatusCodes } from "./ApiTypes";
+import { UsersDao } from "../dao";
 
 export const messages = express.Router();
 
@@ -26,16 +27,16 @@ const getMessages = (user1: User, user2: User) => {
   return userMessages[username1][username2];
 };
 
-messages.get("/convo/:username", (req, res) => {
+messages.get("/convo/:username", async (req, res) => {
   const token = req.cookies.authorization;
 
-  const user1 = Users.getInstance().getUserFromToken(token);
-  const user2 = Users.getInstance().getUser(req.params.username);
+  const user1 = await UsersDao.getInstance().getUserFromToken(token);
+  const user2 = await UsersDao.getInstance().getUser(req.params.username);
 
   res.send(getMessages(user1, user2));
 });
 
-messages.post("/convo/:username", (req, res) => {
+messages.post("/convo/:username", async (req, res) => {
   const token = req.cookies.authorization;
 
   if (!req.body || !req.body.text) {
@@ -43,13 +44,13 @@ messages.post("/convo/:username", (req, res) => {
     return;
   }
 
-  const user1 = Users.getInstance().getUserFromToken(token);
-  const user2 = Users.getInstance().getUser(req.params.username);
+  const user1 = await UsersDao.getInstance().getUserFromToken(token);
+  const user2 = await UsersDao.getInstance().getUser(req.params.username);
 
   getMessages(user1, user2).push({ text: req.body.text, from: user1.username });
   res.sendStatus(StatusCodes.OK);
 });
 
-messages.get("/users/:search", (req, res) => {
-  res.send(Users.getInstance().getUsernames(req.params.search));
+messages.get("/users/:search", async (req, res) => {
+  res.send(UsersDao.getInstance().getUsernames(req.params.search));
 });

@@ -1,11 +1,12 @@
 import * as express from "express";
-import { User, Users } from "../authorization";
+import { User } from "../authorization";
 import { StatusCodes } from "./ApiTypes";
+import { UsersDao } from "../dao";
 
 export const auth = express.Router();
 
-const newToken = (user: User, res: express.Response) => {
-  const token = Users.getInstance().createToken(user.username);
+const newToken = async (user: User, res: express.Response) => {
+  const token = await UsersDao.getInstance().createToken(user.username);
 
   res.cookie("authorization", token, {
     secure: true,
@@ -14,16 +15,16 @@ const newToken = (user: User, res: express.Response) => {
   });
 };
 
-auth.get("/", (req, res) => {
+auth.get("/", async (req, res) => {
   const token = req.cookies?.authorization;
 
-  if (!Users.getInstance().verifyToken(token))
+  if (!(await UsersDao.getInstance().verifyToken(token)))
     res.sendStatus(StatusCodes.UNAUTHORIZED);
   else res.sendStatus(StatusCodes.OK);
 });
 
 // create an account, return auth token
-auth.post("/", (req, res) => {
+auth.post("/", async (req, res) => {
   const user = req.body as User;
 
   if (!user.username || !user.password || !user.email) {
@@ -31,20 +32,20 @@ auth.post("/", (req, res) => {
     return;
   }
 
-  if (Users.getInstance().getUser(user.username)) {
+  if (await UsersDao.getInstance().getUser(user.username)) {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
     return;
   }
 
-  Users.getInstance().addUser(user);
+  await UsersDao.getInstance().addUser(user);
 
-  newToken(user, res);
+  await newToken(user, res);
 
   res.sendStatus(StatusCodes.OK);
 });
 
 // login account, return auth token
-auth.put("/", (req, res) => {
+auth.put("/", async (req, res) => {
   const user = req.body as User;
 
   if (!user.username || !user.password) {
@@ -52,31 +53,30 @@ auth.put("/", (req, res) => {
     return;
   }
 
-  const userStore = Users.getInstance();
+  const userStore = UsersDao.getInstance();
 
-  if (
-    !userStore.getUser(user.username) ||
-    userStore.getUser(user.username).password !== user.password
-  ) {
+  const userFromStore = await userStore.getUser(user.username);
+
+  if (!userFromStore || userFromStore.password !== user.password) {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
     return;
   }
 
-  newToken(user, res);
+  await newToken(user, res);
 
   res.sendStatus(StatusCodes.OK);
 });
 
 // logout auth token
-auth.delete("/", (req, res) => {
+auth.delete("/", async (req, res) => {
   const token = req.cookies?.authorization;
 
-  if (!Users.getInstance().verifyToken(token)) {
+  if (!(await UsersDao.getInstance().verifyToken(token))) {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
     return;
   }
 
-  Users.getInstance().deleteToken(token);
+  await UsersDao.getInstance().deleteToken(token);
 
   res.sendStatus(StatusCodes.OK);
 });
