@@ -10,7 +10,7 @@ const createMessageElement = ({ text, from }, user) => {
   return messageDivContainer;
 };
 
-let currentFriend = undefined;
+let currentConvoId = undefined;
 
 const displayMessages = (messages) => {
   if (!messages) return;
@@ -24,23 +24,48 @@ const displayMessages = (messages) => {
   }
 };
 
-const swapCurrentConvo = async (username) => {
-  const response = await get(`/api/messages/convo/${username}`);
+const createNewConvo = async (username) => {
+  const response = await post(`/api/messages/convo/${username}`);
 
   if (!response.ok) {
     alert("Something went wrong");
     return;
   }
 
-  const messages = await response.json();
+  return (currentConvoId = await response.text());
+};
 
-  currentFriend = username;
+const swapCurrentConvo = async (convoId) => {
+  const response = await get(`/api/messages/${convoId}`);
+
+  const messages = await response.json();
 
   displayMessages(messages);
 };
 
 const friendsSearchInput = document.getElementById("friend-search");
 const friendsList = document.getElementById("friend-list");
+
+const addConvos = async (convos, user) => {
+  if (!convos) return;
+
+  friendsList.innerHTML = "";
+
+  for (const convo of convos) {
+    const p = document.createElement("p");
+    const friends = convo.users.filter(
+      (username) => username !== user.username,
+    );
+    p.innerText = friends.join(", ");
+    const ul = document.createElement("ul");
+    ul.appendChild(p);
+    ul.addEventListener("click", async () => {
+      currentConvoId = convo.convoId;
+      await swapCurrentConvo(convo.convoId);
+    });
+    friendsList.appendChild(ul);
+  }
+};
 
 friendsSearchInput.addEventListener("keydown", async (e) => {
   if (e.keyCode !== 13 || !e.target.value) return;
@@ -61,7 +86,10 @@ friendsSearchInput.addEventListener("keydown", async (e) => {
     p.innerText = friend;
     const ul = document.createElement("ul");
     ul.appendChild(p);
-    ul.addEventListener("click", () => swapCurrentConvo(friend));
+    ul.addEventListener("click", async () => {
+      const convoId = await createNewConvo(friend);
+      await swapCurrentConvo(convoId);
+    });
     friendsList.appendChild(ul);
   }
 });
@@ -78,7 +106,7 @@ const getRandomJoke = async () => {
   return (await response.json())[0].joke;
 };
 
-(() => {
+(async () => {
   const sendMessageInput = document.getElementById("message-input");
   const messageContainer = document.getElementById("messages");
   const user = getCurrentUser();
@@ -107,17 +135,23 @@ const getRandomJoke = async () => {
 
   window.addEventListener("resize", setMaxSizeOfMessageContainer);
 
+  const response = await get(`/api/messages/convo/${user.username}`);
+
+  const convos = await response.json();
+
+  addConvos(convos, user);
+
   sendMessageInput.addEventListener("keydown", async (e) => {
     if (e.keyCode !== 13 || !e.target.value) return;
+
+    if (!currentConvoId) return;
 
     if (e.target.value === "joke") {
       const joke = await getRandomJoke();
       if (joke) e.target.value = joke;
     }
 
-    if (!currentFriend) currentFriend = user.username;
-
-    const response = await post(`/api/messages/convo/${currentFriend}`, {
+    const response = await post(`/api/messages/${currentConvoId}`, {
       text: e.target.value,
     });
 
@@ -128,6 +162,6 @@ const getRandomJoke = async () => {
       return;
     }
 
-    swapCurrentConvo(currentFriend);
+    swapCurrentConvo(currentConvoId);
   });
 })();

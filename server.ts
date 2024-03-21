@@ -6,14 +6,23 @@ import { api } from "./src-server";
 import type { MiddleWare } from "./src-server";
 import { StatusCodes } from "./src-server/routers";
 import { UsersDao } from "./src-server/dao";
-import { UsersMemoryDao } from "./src-server/dao/memory-dao/UsersMemoryDao";
-import { TokensMemoryDao } from "./src-server/dao/memory-dao/TokensMemoryDao";
+import {
+  ConvoMemoryDao,
+  MessagesMemoryDao,
+  TokensMemoryDao,
+  UsersMemoryDao,
+} from "./src-server/dao/memory-dao";
 
 (async () => {
   const app = express();
   const port = process.env.PORT || 4000;
 
-  new UsersDao(new UsersMemoryDao(), new TokensMemoryDao());
+  UsersDao.initialize({
+    usersDao: new UsersMemoryDao(),
+    tokensDao: new TokensMemoryDao(),
+    messageDao: new MessagesMemoryDao(),
+    convoDao: new ConvoMemoryDao(),
+  });
 
   app.use(express.static("public"));
   app.use(express.json());

@@ -13,8 +13,14 @@ export type TokenPair = {
 };
 
 export type ConvoSearch = {
-  username: string;
-  daterange: [number, number];
+  username?: string;
+  convoId?: string;
+  daterange?: [number, number];
+};
+
+export type Convo = {
+  convoId: string;
+  users: string[];
 };
 
 export type MessageAdd = {
