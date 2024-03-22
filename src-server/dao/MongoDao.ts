@@ -1,5 +1,5 @@
-import { Collection, Db, MongoClient, WithId } from "mongodb";
-import { BadRequestError, User } from "../authorization";
+import { Collection, Db, Filter, MongoClient, WithId } from "mongodb";
+import { BadRequestError, UnauthorizedError, User } from "../authorization";
 import { Convo, Message } from "../messages";
 import { IDao } from "./DaoTypes";
 import * as crypto from "node:crypto";
@@ -12,11 +12,6 @@ type TokenPair = {
 type ConvoInfo = {
   username: string;
   convos: Record<string, number>;
-};
-
-type ConvoUsers = {
-  convoId: string;
-  users: string[];
 };
 
 type ConvoMessages = {
@@ -32,7 +27,7 @@ export class MongoDao implements IDao {
   private users: Collection<User>;
   private tokens: Collection<TokenPair>;
   private convos: Collection<ConvoInfo>;
-  private usersInConvo: Collection<ConvoUsers>;
+  private usersInConvo: Collection<Convo>;
   private messages: Collection<ConvoMessages>;
 
   private static _instance: MongoDao;
@@ -107,22 +102,74 @@ export class MongoDao implements IDao {
     await this.tokens.deleteOne({ token });
   }
   async getUserFromToken(token: string): Promise<User> {
-    throw new Error("Method not implemented.");
+    const username = await this.verifyToken(token);
+    if (!username) return undefined;
+    const user = await this.getUser(username);
+    return user;
   }
   async getUsernames(searchTerm: string): Promise<string[]> {
-    throw new Error("Method not implemented.");
+    // search for usernames w/ regex
+    const query: Filter<User> = {
+      username: { $regex: searchTerm, $options: "i" },
+    };
+
+    // only return username field
+    const projection = { username: 1, _id: 0 };
+
+    const partialUsers = await this.users
+      .find(query)
+      .project<Partial<User>>(projection)
+      .toArray();
+
+    return partialUsers.map((user) => user.username);
   }
+
   async createConvo(users: string[]): Promise<string> {
-    throw new Error("Method not implemented.");
+    const convoId = crypto.randomUUID();
+
+    await this.usersInConvo.insertOne({ convoId, users });
+
+    const now = Date.now();
+
+    for (const username in users) {
+      await this.convos.updateOne(
+        { username },
+        { $set: { [`convos.${convoId}`]: now } },
+        { upsert: true },
+      );
+    }
+
+    return convoId;
   }
   async getUserConvos(
     username: string,
-    dateRange: [number, number],
+    [before, after]: [number, number],
   ): Promise<Convo[]> {
-    throw new Error("Method not implemented.");
+    const userConvos = await this.convos.findOne({ username });
+
+    const convoIds = Object.keys(userConvos.convos).filter(
+      (convoId) =>
+        userConvos.convos[convoId] >= before &&
+        userConvos.convos[convoId] <= after,
+    );
+
+    const cursor = this.usersInConvo.find({ convoId: { $in: convoIds } });
+
+    const convos: Convo[] = [];
+
+    for await (const convo of cursor) {
+      convos.push(this.removeId(convo));
+    }
+
+    return convos;
   }
   async getUsersInConvo(convoId: string, user: User): Promise<string[]> {
-    throw new Error("Method not implemented.");
+    const convo = await this.usersInConvo.findOne({ convoId });
+
+    if (!convo || !convo.users.includes(user.username))
+      throw new UnauthorizedError();
+
+    return convo.users;
   }
   async addMessage(
     convoId: string,
