@@ -176,13 +176,41 @@ export class MongoDao implements IDao {
     message: Message,
     user: User,
   ): Promise<void> {
-    throw new Error("Method not implemented.");
+    // this will automatically check if user is in convo
+    // and will err out if not
+    await this.getUsersInConvo(convoId, user);
+
+    const convo = await this.messages.findOne({ convoId });
+
+    if (!convo) await this.messages.insertOne({ convoId, messages: [message] });
+    else
+      await this.messages.updateOne(
+        { convoId },
+        { $push: { messages: message } },
+      );
   }
   async getMessages(
     convoId: string,
-    dateRange: [number, number],
+    [before, after]: [number, number],
     user: User,
   ): Promise<Message[]> {
-    throw new Error("Method not implemented.");
+    // this will automatically check if user is in convo
+    // and will err out if not
+    await this.getUsersInConvo(convoId, user);
+
+    const convo = await this.messages.findOne({ convoId });
+
+    if (!convo) return undefined;
+
+    const messages = [];
+
+    for (const message of convo.messages) {
+      if (message.timestamp <= before) continue;
+      if (message.timestamp >= after) break;
+
+      messages.push(message);
+    }
+
+    return messages;
   }
 }
