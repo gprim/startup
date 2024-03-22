@@ -93,13 +93,18 @@ export class MongoDao implements IDao {
     await this.users.insertOne(user);
   }
   async createToken(username: string): Promise<string> {
-    throw new Error("Method not implemented.");
+    const token = crypto.randomUUID();
+
+    await this.tokens.insertOne({ token, username });
+
+    return token;
   }
   async verifyToken(token: string): Promise<string> {
-    throw new Error("Method not implemented.");
+    const tokenPair = await this.tokens.findOne({ token });
+    return tokenPair?.username;
   }
   async deleteToken(token: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    await this.tokens.deleteOne({ token });
   }
   async getUserFromToken(token: string): Promise<User> {
     throw new Error("Method not implemented.");
