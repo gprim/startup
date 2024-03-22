@@ -56,7 +56,10 @@ const addConvos = async (convos, user) => {
     const friends = convo.users.filter(
       (username) => username !== user.username,
     );
-    p.innerText = friends.join(", ");
+
+    const convoName = friends.length ? friends.join(", ") : user.username;
+
+    p.innerText = convoName;
     const ul = document.createElement("ul");
     ul.appendChild(p);
     ul.addEventListener("click", async () => {
@@ -144,7 +147,7 @@ const getRandomJoke = async () => {
   sendMessageInput.addEventListener("keydown", async (e) => {
     if (e.keyCode !== 13 || !e.target.value) return;
 
-    if (!currentConvoId) return;
+    if (!currentConvoId) await createNewConvo(user.username);
 
     if (e.target.value === "joke") {
       const joke = await getRandomJoke();
