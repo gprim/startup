@@ -3,3 +3,8 @@ export type Message = {
   from: string;
   timestamp: number;
 };
+
+export type Convo = {
+  convoId: string;
+  users: string[];
+};

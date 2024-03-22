@@ -1,12 +1,12 @@
 import * as express from "express";
 import { User } from "../authorization";
 import { StatusCodes } from "./ApiTypes";
-import { UsersDao } from "../dao";
+import { UserDao } from "../dao";
 
 export const auth = express.Router();
 
 const newToken = async (user: User, res: express.Response) => {
-  const token = await UsersDao.getInstance().createToken(user.username);
+  const token = await UserDao.getInstance().createToken(user.username);
 
   res.cookie("authorization", token, {
     secure: true,
@@ -18,7 +18,7 @@ const newToken = async (user: User, res: express.Response) => {
 auth.get("/", async (req, res) => {
   const token = req.cookies?.authorization;
 
-  if (!(await UsersDao.getInstance().verifyToken(token)))
+  if (!(await UserDao.getInstance().verifyToken(token)))
     res.sendStatus(StatusCodes.UNAUTHORIZED);
   else res.sendStatus(StatusCodes.OK);
 });
@@ -32,12 +32,12 @@ auth.post("/", async (req, res) => {
     return;
   }
 
-  if (await UsersDao.getInstance().getUser(user.username)) {
+  if (await UserDao.getInstance().getUser(user.username)) {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
     return;
   }
 
-  await UsersDao.getInstance().addUser(user);
+  await UserDao.getInstance().addUser(user);
 
   await newToken(user, res);
 
@@ -53,7 +53,7 @@ auth.put("/", async (req, res) => {
     return;
   }
 
-  const userStore = UsersDao.getInstance();
+  const userStore = UserDao.getInstance();
 
   const userFromStore = await userStore.getUser(user.username);
 
@@ -71,12 +71,12 @@ auth.put("/", async (req, res) => {
 auth.delete("/", async (req, res) => {
   const token = req.cookies?.authorization;
 
-  if (!(await UsersDao.getInstance().verifyToken(token))) {
+  if (!(await UserDao.getInstance().verifyToken(token))) {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
     return;
   }
 
-  await UsersDao.getInstance().deleteToken(token);
+  await UserDao.getInstance().deleteToken(token);
 
   res.sendStatus(StatusCodes.OK);
 });

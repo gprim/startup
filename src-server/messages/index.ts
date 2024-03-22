@@ -1,1 +1,1 @@
-export type { Message } from "./MessageTypes";
+export type { Message, Convo } from "./MessageTypes";

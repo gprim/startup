@@ -1,8 +1,2 @@
-export type {
-  IDao,
-  TokenPair,
-  MessageAdd,
-  MessageSearch,
-  ConvoSearch,
-} from "./DaoTypes";
-export { UsersDao } from "./UsersDao";
+export type { IDao } from "./DaoTypes";
+export { UserDao } from "./UserDao";

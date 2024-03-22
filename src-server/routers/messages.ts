@@ -1,6 +1,6 @@
 import * as express from "express";
 import { StatusCodes } from "./ApiTypes";
-import { UsersDao } from "../dao";
+import { UserDao } from "../dao";
 
 export const messages = express.Router();
 
@@ -8,29 +8,29 @@ export const messages = express.Router();
 messages.post("/convo/:username", async (req, res) => {
   const token = req.cookies?.authorization;
 
-  const user1 = (await UsersDao.getInstance().getUserFromToken(token)).username;
+  const user1 = (await UserDao.getInstance().getUserFromToken(token)).username;
   const user2 = req.params.username;
 
-  const convoId = await UsersDao.getInstance().createConvo([user1, user2]);
+  const convoId = await UserDao.getInstance().createConvo([user1, user2]);
 
   res.send(convoId);
 });
 
 // search for other users
 messages.get("/users/:search", async (req, res) => {
-  res.send(await UsersDao.getInstance().getUsernames(req.params.search));
+  res.send(await UserDao.getInstance().getUsernames(req.params.search));
 });
 
 // get all convos associated with the user
-messages.get("/convo/:username", async (req, res) => {
+messages.get("/convo", async (req, res) => {
   const token = req.cookies?.authorization;
 
-  const user = await UsersDao.getInstance().getUserFromToken(token);
+  const username = (await UserDao.getInstance().getUserFromToken(token))
+    ?.username;
 
-  const convos = await UsersDao.getInstance().getConvos({
-    username: user.username,
-    daterange: [0, new Date().getUTCMilliseconds()],
-  });
+  const now = Date.now();
+
+  const convos = await UserDao.getInstance().getUserConvos(username, [0, now]);
 
   res.send(convos);
 });
@@ -40,13 +40,13 @@ messages.get("/:convoId", async (req, res) => {
   const convoId = req.params.convoId;
   const token = req.cookies?.authorization;
 
-  const user = await UsersDao.getInstance().getUserFromToken(token);
+  const user = await UserDao.getInstance().getUserFromToken(token);
 
-  const messages = await UsersDao.getInstance().getMessages(
-    {
-      convoId,
-      dateRange: [0, new Date().getUTCMilliseconds()],
-    },
+  const now = Date.now();
+
+  const messages = await UserDao.getInstance().getMessages(
+    convoId,
+    [0, now],
     user,
   );
 
@@ -64,16 +64,16 @@ messages.post("/:convoId", async (req, res) => {
     return;
   }
 
-  const user = await UsersDao.getInstance().getUserFromToken(token);
+  const user = await UserDao.getInstance().getUserFromToken(token);
 
-  await UsersDao.getInstance().addMessage(
+  const now = Date.now();
+
+  await UserDao.getInstance().addMessage(
+    convoId,
     {
-      convoId,
-      message: {
-        text: req.body.text,
-        from: user.username,
-        timestamp: new Date().getUTCMilliseconds(),
-      },
+      text: req.body.text,
+      from: user.username,
+      timestamp: now,
     },
     user,
   );

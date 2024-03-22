@@ -135,7 +135,7 @@ const getRandomJoke = async () => {
 
   window.addEventListener("resize", setMaxSizeOfMessageContainer);
 
-  const response = await get(`/api/messages/convo/${user.username}`);
+  const response = await get("/api/messages/convo");
 
   const convos = await response.json();
 

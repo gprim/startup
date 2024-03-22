@@ -5,24 +5,12 @@ import * as cookieParser from "cookie-parser";
 import { api } from "./src-server";
 import type { MiddleWare } from "./src-server";
 import { StatusCodes } from "./src-server/routers";
-import { UsersDao } from "./src-server/dao";
-import {
-  ConvoMemoryDao,
-  MessagesMemoryDao,
-  TokensMemoryDao,
-  UsersMemoryDao,
-} from "./src-server/dao/memory-dao";
+import { UserDao } from "./src-server/dao";
+import { BadRequestError, UnauthorizedError } from "./src-server/authorization";
 
 (async () => {
   const app = express();
   const port = process.env.PORT || 4000;
-
-  UsersDao.initialize({
-    usersDao: new UsersMemoryDao(),
-    tokensDao: new TokensMemoryDao(),
-    messageDao: new MessagesMemoryDao(),
-    convoDao: new ConvoMemoryDao(),
-  });
 
   app.use(express.static("public"));
   app.use(express.json());
@@ -38,7 +26,7 @@ import {
 
   const authMiddleware: MiddleWare = async (req, res, next) => {
     const token = req.cookies?.authorization;
-    if (!token || !(await UsersDao.getInstance().verifyToken(token))) {
+    if (!token || !(await UserDao.getInstance().verifyToken(token))) {
       res.sendStatus(StatusCodes.UNAUTHORIZED);
       return;
     }
@@ -46,7 +34,29 @@ import {
     return next();
   };
 
+  const errorMiddleware = async (
+    err: Error,
+    _req: express.Request,
+    res: express.Response,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _next: express.NextFunction,
+  ) => {
+    if (err instanceof UnauthorizedError) {
+      res.sendStatus(StatusCodes.UNAUTHORIZED);
+      return;
+    } else if (err instanceof BadRequestError) {
+      res.sendStatus(StatusCodes.BAD_REQUEST);
+      return;
+    }
+
+    console.error(err);
+
+    res.sendStatus(StatusCodes.SERVER_ERROR);
+  };
+
   app.use(middlewareWrapper(authMiddleware));
+
+  app.use(errorMiddleware);
 
   app.get("/", (_req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
