@@ -119,7 +119,7 @@ Application logic
 
 - If a user isn't logged in, then it will display some things such as not letting them send messages because they need to be logged in.
 
-### Service delierable
+### Service deliverable
 
  - Node.js/Express HTTP service: Done!
  - Static middleware for frontend: Done!
@@ -128,3 +128,11 @@ Application logic
  - Frontend calls service endpoints: Calls to auth and messages, and 3rd party joke service.
 
 Also, decided to change and focus exclusively on the messaging service. Games would be too hard right now, and for now the games tab can serve like a curated list of games to play. Messaging is plenty hard and still hits all requirements.
+
+### Login deliverable
+
+ - MongoDB Atlas database created - done!
+ - Stores data in MongoDB - done!
+ - User registration - user info and auth tokens stored in the database!
+ - Restricts functionality - Users can only create convos and messages if they are involved in a convo. Restricted on the back end
+ 
