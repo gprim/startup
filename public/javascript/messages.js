@@ -140,9 +140,17 @@ const getRandomJoke = async () => {
 
   const response = await get("/api/messages/convo");
 
-  const convos = await response.json();
+  let convos = await response.json();
+
+  if (!convos) {
+    await createNewConvo(user.username);
+    convos = await (await get("/api/messages/convo")).json();
+  }
+
+  currentConvoId = convos[0].convoId;
 
   addConvos(convos, user);
+  swapCurrentConvo(currentConvoId);
 
   sendMessageInput.addEventListener("keydown", async (e) => {
     if (e.keyCode !== 13 || !e.target.value) return;
