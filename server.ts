@@ -5,12 +5,22 @@ import * as cookieParser from "cookie-parser";
 import { api } from "./src-server";
 import type { MiddleWare } from "./src-server";
 import { StatusCodes } from "./src-server/routers";
-import { UserDao } from "./src-server/dao";
+import { MongoDao, UserDao } from "./src-server/dao";
 import { BadRequestError, UnauthorizedError } from "./src-server/authorization";
 
 (async () => {
   const app = express();
   const port = process.env.PORT || 4000;
+
+  if (process.env.MONGO_USERNAME) {
+    const username = process.env.MONGO_USERNAME;
+    const password = process.env.MONGO_PASSWORD;
+    const hostname = process.env.MONGO_HOSTNAME;
+
+    const mongoDao = await MongoDao.initialize(username, password, hostname);
+
+    UserDao.setInstance(mongoDao);
+  }
 
   app.use(express.static("public"));
   app.use(express.json());

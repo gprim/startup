@@ -45,7 +45,7 @@ export class MongoDao implements IDao {
     this.users.createIndex({ username: 1 }, { unique: true });
 
     this.tokens = this.db.collection("tokens");
-    this.users.createIndex({ token: 1 }, { unique: true });
+    this.tokens.createIndex({ token: 1 }, { unique: true });
 
     this.convos = this.db.collection("convos");
     this.convos.createIndex({ username: 1 }, { unique: true });
@@ -131,7 +131,7 @@ export class MongoDao implements IDao {
 
     const now = Date.now();
 
-    for (const username in users) {
+    for (const username of users) {
       await this.convos.updateOne(
         { username },
         { $set: { [`convos.${convoId}`]: now } },
@@ -146,6 +146,8 @@ export class MongoDao implements IDao {
     [before, after]: [number, number],
   ): Promise<Convo[]> {
     const userConvos = await this.convos.findOne({ username });
+
+    if (!userConvos) return [];
 
     const convoIds = Object.keys(userConvos.convos).filter(
       (convoId) =>
