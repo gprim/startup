@@ -7,6 +7,7 @@ import type { MiddleWare } from "./src-server";
 import { StatusCodes } from "./src-server/routers";
 import { MongoDao, UserDao } from "./src-server/dao";
 import { BadRequestError, UnauthorizedError } from "./src-server/authorization";
+import { WebSocketHandler } from "./src-server/websocket/WebsocketHandler";
 
 (async () => {
   const app = express();
@@ -74,5 +75,11 @@ import { BadRequestError, UnauthorizedError } from "./src-server/authorization";
 
   app.use("/api", api);
 
-  app.listen(port, () => console.log(`Listening on port ${port}`));
+  const server = app.listen(port, () =>
+    console.log(`Listening on port ${port}`),
+  );
+
+  const websocketHandler = new WebSocketHandler();
+
+  server.on("upgrade", websocketHandler.upgrade);
 })();
