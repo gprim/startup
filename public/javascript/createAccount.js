@@ -22,12 +22,14 @@ loginForm.addEventListener("submit", async (e) => {
     }
   }
 
+  let success = false;
+
   try {
-    await createAccount(email, username, password);
+    success = await createAccount(email, username, password);
   } catch (err) {
     alert(err.message);
     return;
   }
 
-  window.location.href = window.location.origin;
+  if (success) window.location.href = window.location.origin;
 });

@@ -24,7 +24,7 @@ auth.get("/", async (req, res) => {
 });
 
 // create an account, return auth token
-auth.post("/", async (req, res) => {
+auth.post("/", async (req, res, next) => {
   const user = req.body as User;
 
   if (!user.username || !user.password || !user.email) {
@@ -37,7 +37,12 @@ auth.post("/", async (req, res) => {
     return;
   }
 
-  await UserDao.getInstance().addUser(user);
+  try {
+    await UserDao.getInstance().addUser(user);
+  } catch (err) {
+    next(err);
+    return;
+  }
 
   await newToken(user, res);
 

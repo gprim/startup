@@ -7,8 +7,8 @@ import type { MiddleWare } from "./src-server";
 import { StatusCodes } from "./src-server/routers";
 import { MongoDao, UserDao } from "./src-server/dao";
 import { BadRequestError, UnauthorizedError } from "./src-server/authorization";
-import { WebSocketHandler } from "./src-server/websocket/WebsocketHandler";
-import { WebSocketServer } from "ws";
+import { WebSocketHandler } from "./src-server/websocket/WebSocketHandler";
+import { messageWSS } from "./src-server/messages";
 
 (async () => {
   const app = express();
@@ -68,27 +68,21 @@ import { WebSocketServer } from "ws";
 
   app.use(middlewareWrapper(authMiddleware));
 
-  app.use(errorMiddleware);
-
   app.get("/", (_req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
   });
 
   app.use("/api", api);
 
+  app.use(errorMiddleware);
+
   const server = app.listen(port, () =>
     console.log(`Listening on port ${port}`),
   );
 
-  const wsHandler = WebSocketHandler.initialize(server);
+  const wsHandler = WebSocketHandler.getInstance();
 
-  const wss = new WebSocketServer({ noServer: true });
+  wsHandler.bindHttpServer(server);
 
-  wss.on("connection", (ws) => {
-    ws.on("message", (data) => {
-      ws.send(data);
-    });
-  });
-
-  wsHandler.addWebsocketHandler("/ws", wss);
+  wsHandler.registerWSServer("/messages", messageWSS);
 })();

@@ -44,14 +44,16 @@ export const createAccount = async (email, username, password) => {
     const response = await post("/api/auth", user);
     if (response.status === 401) {
       alert(`Username ${username} already taken`);
-      return;
+      return false;
     }
   } catch (ex) {
     alert(ex.message);
-    return;
+    return false;
   }
 
   saveUser(user);
+
+  return true;
 };
 
 export const login = async (username, password) => {
