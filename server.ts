@@ -8,6 +8,7 @@ import { StatusCodes } from "./src-server/routers";
 import { MongoDao, UserDao } from "./src-server/dao";
 import { BadRequestError, UnauthorizedError } from "./src-server/authorization";
 import { WebSocketHandler } from "./src-server/websocket/WebsocketHandler";
+import { WebSocketServer } from "ws";
 
 (async () => {
   const app = express();
@@ -79,7 +80,15 @@ import { WebSocketHandler } from "./src-server/websocket/WebsocketHandler";
     console.log(`Listening on port ${port}`),
   );
 
-  const websocketHandler = new WebSocketHandler();
+  const wsHandler = WebSocketHandler.initialize(server);
 
-  server.on("upgrade", websocketHandler.upgrade);
+  const wss = new WebSocketServer({ noServer: true });
+
+  wss.on("connection", (ws) => {
+    ws.on("message", (data) => {
+      ws.send(data);
+    });
+  });
+
+  wsHandler.addWebsocketHandler("/ws", wss);
 })();

@@ -138,6 +138,18 @@ const getRandomJoke = async () => {
 
   window.addEventListener("resize", setMaxSizeOfMessageContainer);
 
+  const protocol = window.location.protocol === "http:" ? "ws" : "wss";
+
+  const socket = new WebSocket(`${protocol}://${window.location.host}/ws`);
+
+  socket.onopen = (e) => {
+    console.log(e);
+  };
+
+  socket.onmessage = (e) => {
+    console.log(e);
+  };
+
   const response = await get("/api/messages/convo");
 
   let convos = await response.json();
@@ -165,6 +177,8 @@ const getRandomJoke = async () => {
     const response = await post(`/api/messages/${currentConvoId}`, {
       text: e.target.value,
     });
+
+    socket.send(e.target.value);
 
     e.target.value = "";
 
