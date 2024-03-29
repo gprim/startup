@@ -53,16 +53,12 @@ auth.post("/", async (req, res, next) => {
 auth.put("/", async (req, res) => {
   const user = req.body as User;
 
-  if (!user.username || !user.password) {
+  if (!user || !user.username || !user.password) {
     res.sendStatus(StatusCodes.BAD_REQUEST);
     return;
   }
 
-  const userStore = UserDao.getInstance();
-
-  const userFromStore = await userStore.getUser(user.username);
-
-  if (!userFromStore || userFromStore.password !== user.password) {
+  if (!(await UserDao.getInstance().verifyUser(user))) {
     res.sendStatus(StatusCodes.UNAUTHORIZED);
     return;
   }

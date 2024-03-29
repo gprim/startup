@@ -36,6 +36,14 @@ export class MemoryDao implements IDao {
     this.usernames.add(user.username);
   }
 
+  async verifyUser(user: User) {
+    const storedUser = await this.getUser(user.username);
+
+    if (!storedUser) return false;
+
+    return user.password === storedUser.password;
+  }
+
   async createToken(username: string) {
     const token = crypto.randomUUID();
 

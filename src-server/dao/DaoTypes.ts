@@ -4,6 +4,7 @@ import type { Convo, Message } from "../messages";
 export interface IDao {
   getUser(username: string): Promise<User>;
   addUser(user: User): Promise<void>;
+  verifyUser(user: User): Promise<boolean>;
   createToken(username: string): Promise<string>;
   verifyToken(token: string): Promise<string>;
   deleteToken(token: string): Promise<void>;

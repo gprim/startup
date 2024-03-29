@@ -3,6 +3,7 @@ import { BadRequestError, UnauthorizedError, User } from "../authorization";
 import { Convo, Message } from "../messages";
 import { IDao } from "./DaoTypes";
 import * as crypto from "node:crypto";
+import { genSalt, hash, compare } from "bcrypt";
 
 type TokenPair = {
   token: string;
@@ -36,7 +37,6 @@ export class MongoDao implements IDao {
     this.url = `mongodb+srv://${username}:${password}@${hostname}`;
     this.client = new MongoClient(this.url);
   }
-
   private async connect() {
     await this.client.connect();
     this.db = this.client.db("startup");
@@ -85,8 +85,23 @@ export class MongoDao implements IDao {
     if (await this.getUser(user.username))
       throw new BadRequestError("User already exists");
 
+    const salt = await genSalt();
+
+    const hashedPassword = await hash(user.password, salt);
+
+    user.password = hashedPassword;
+
     await this.users.insertOne(user);
   }
+
+  async verifyUser(user: User) {
+    const storedUser = await this.getUser(user.username);
+
+    if (!storedUser) return false;
+
+    return await compare(user.password, storedUser.password);
+  }
+
   async createToken(username: string): Promise<string> {
     const token = crypto.randomUUID();
 
@@ -94,19 +109,23 @@ export class MongoDao implements IDao {
 
     return token;
   }
+
   async verifyToken(token: string): Promise<string> {
     const tokenPair = await this.tokens.findOne({ token });
     return tokenPair?.username;
   }
+
   async deleteToken(token: string): Promise<void> {
     await this.tokens.deleteOne({ token });
   }
+
   async getUserFromToken(token: string): Promise<User> {
     const username = await this.verifyToken(token);
     if (!username) return undefined;
     const user = await this.getUser(username);
     return user;
   }
+
   async getUsernames(searchTerm: string): Promise<string[]> {
     // search for usernames w/ regex
     const query: Filter<User> = {
@@ -141,6 +160,7 @@ export class MongoDao implements IDao {
 
     return convoId;
   }
+
   async getUserConvos(
     username: string,
     [before, after]: [number, number],
@@ -165,6 +185,7 @@ export class MongoDao implements IDao {
 
     return convos;
   }
+
   async getUsersInConvo(convoId: string, user: User): Promise<string[]> {
     const convo = await this.usersInConvo.findOne({ convoId });
 
@@ -173,6 +194,7 @@ export class MongoDao implements IDao {
 
     return convo.users;
   }
+
   async addMessage(
     convoId: string,
     message: Message,
@@ -191,6 +213,7 @@ export class MongoDao implements IDao {
         { $push: { messages: message } },
       );
   }
+
   async getMessages(
     convoId: string,
     [before, after]: [number, number],
