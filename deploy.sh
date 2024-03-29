@@ -20,6 +20,7 @@ printf "\n----> Deploying files for $service to $hostname with $key\n"
 # Step 1
 printf "\n----> Clear out the previous distribution on the target.\n"
 ssh -i "$key" ubuntu@$hostname << ENDSSH
+cp services/${service}/.env services/.env
 rm -rf services/${service}
 mkdir -p services/${service}
 ENDSSH
@@ -34,6 +35,7 @@ scp -r -i "$key" "$NODE_SERVER_FOLDER" ubuntu@$hostname:services/$service
 printf "\n----> Turn on the server.\n"
 ssh -i "$key" ubuntu@$hostname << ENDSSH
 bash -i
+mv services/.env services/${service}/.env
 cd services/${service}
 mv output/package.json ./
 npm i --omit=dev
