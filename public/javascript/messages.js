@@ -12,17 +12,23 @@ const createMessageElement = ({ text, from }, user) => {
 
 let currentConvoId = undefined;
 let wsToken = "";
+const messageContainer = document.getElementById("messages");
+
+const addMessage = (messageElement) => {
+  messageContainer.appendChild(messageElement);
+  messageContainer.scrollTop = messageContainer.scrollHeight;
+};
 
 const displayMessages = (messages) => {
   if (!messages) return;
   const user = getCurrentUser();
 
-  const messageContainer = document.getElementById("messages");
   messageContainer.innerHTML = "";
 
   for (const message of messages) {
     messageContainer.appendChild(createMessageElement(message, user));
   }
+  messageContainer.scrollTop = messageContainer.scrollHeight;
 };
 
 const createNewConvo = async (username) => {
@@ -160,6 +166,10 @@ const getRandomJoke = async () => {
       socket.send(JSON.stringify({ type: "token", token: wsToken }));
       return;
     }
+
+    if (data.text) {
+      addMessage(createMessageElement(data, user));
+    }
   };
 
   socket.onclose = () => {
@@ -178,6 +188,8 @@ const getRandomJoke = async () => {
 
   currentConvoId = convos[0].convoId;
 
+  socket.send(JSON.stringify({ type: "convo", convoId: currentConvoId }));
+
   addConvos(convos, user);
   swapCurrentConvo(currentConvoId);
 
@@ -186,24 +198,22 @@ const getRandomJoke = async () => {
 
     if (!currentConvoId) await createNewConvo(user.username);
 
-    if (e.target.value === "joke") {
-      const joke = await getRandomJoke();
-      if (joke) e.target.value = joke;
-    }
-
-    const response = await post(`/api/messages/${currentConvoId}`, {
-      text: e.target.value,
-    });
-
-    socket.send(e.target.value);
+    let text = e.target.value;
 
     e.target.value = "";
+
+    if (text === "joke") {
+      const joke = await getRandomJoke();
+      if (joke) text = joke;
+    }
+
+    socket.send(JSON.stringify({ type: "message", message: text }));
 
     if (!response.ok) {
       alert("Something went wrong");
       return;
     }
 
-    swapCurrentConvo(currentConvoId);
+    addMessage(createMessageElement({ text: text, from: user.username }, user));
   });
 })();
