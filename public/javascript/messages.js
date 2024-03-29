@@ -181,7 +181,7 @@ const getRandomJoke = async () => {
 
   let convos = await response.json();
 
-  if (!convos) {
+  if (!convos.length) {
     await createNewConvo(user.username);
     convos = await (await get("/api/messages/convo")).json();
   }
