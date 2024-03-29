@@ -1,5 +1,5 @@
 import * as express from "express";
-import { AsyncMiddleWare, StatusCodes } from "./ApiTypes";
+import { AsyncMiddleWare } from "./ApiTypes";
 import { UserDao } from "../dao";
 
 export const messages = express.Router();
@@ -76,36 +76,5 @@ messages.get(
     );
 
     res.send(messages);
-  }),
-);
-
-// send a message
-messages.post(
-  "/:convoId",
-  errorHandler(async (req, res) => {
-    const token = req.cookies?.authorization;
-
-    const convoId = req.params.convoId;
-
-    if (!req.body || !req.body.text) {
-      res.sendStatus(StatusCodes.BAD_REQUEST);
-      return;
-    }
-
-    const user = await UserDao.getInstance().getUserFromToken(token);
-
-    const now = Date.now();
-
-    await UserDao.getInstance().addMessage(
-      convoId,
-      {
-        text: req.body.text,
-        from: user.username,
-        timestamp: now,
-      },
-      user,
-    );
-
-    res.sendStatus(StatusCodes.OK);
   }),
 );
