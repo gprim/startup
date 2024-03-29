@@ -1,11 +1,14 @@
 import { WebSocketServer } from "ws";
 import { IncomingMessage, Server } from "http";
 import * as stream from "node:stream";
+import { UserDao } from "../dao";
+import * as crypto from "node:crypto";
 
 export class WebSocketHandler {
   private static _instance: WebSocketHandler;
 
   private servers: Record<string, WebSocketServer> = {};
+  private tokens: Record<string, string> = {};
 
   private constructor() {}
 
@@ -23,12 +26,43 @@ export class WebSocketHandler {
     this.servers[path] = websocketServer;
   }
 
-  upgrade(req: IncomingMessage, socket: stream.Duplex, head: Buffer) {
-    if (!req.url || !this.servers[req.url]) return;
+  async upgrade(req: IncomingMessage, socket: stream.Duplex, head: Buffer) {
+    if (!req.url || !this.servers[req.url]) {
+      socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+      socket.destroy();
+      return;
+    }
+
+    const cookies = req.headers.cookie
+      .split("; ")
+      .reduce<Record<string, string>>((cookies, current) => {
+        const [name, cookie] = current.split("=");
+        cookies[name] = cookie;
+        return cookies;
+      }, {});
+
+    if (
+      !cookies.authorization ||
+      !(await UserDao.getInstance().verifyToken(cookies.authorization))
+    ) {
+      socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
+      socket.destroy();
+      return;
+    }
+
     const server = this.servers[req.url];
 
+    const token = crypto.randomUUID();
+
+    this.tokens[token] = cookies.authorization;
+
     server.handleUpgrade(req, socket, head, (ws) => {
-      server.emit("connection", ws, req);
+      server.emit("connection", ws, req, token);
+      ws.send(JSON.stringify({ token }));
     });
+  }
+
+  getToken(token: string) {
+    return this.tokens[token];
   }
 }
