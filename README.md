@@ -136,3 +136,11 @@ Also, decided to change and focus exclusively on the messaging service. Games wo
  - User registration - user info and auth tokens stored in the database!
  - Messages and convos stored on the database!
  - Restricts functionality - Users can only create convos and messages if they are involved in a convo. Restricted on the back end
+
+### Websocket deliverable
+
+ - Backend listeners for WebSocket connection: Done!
+ - Frontend creates WebSocket connection: Done!
+ - Data sent over WebSocket connection: Done!
+ - Websocket data displayed: When a message is sent, it will display on the user who it was sent to's screen
+ 

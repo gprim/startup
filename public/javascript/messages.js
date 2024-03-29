@@ -13,6 +13,7 @@ const createMessageElement = ({ text, from }, user) => {
 let currentConvoId = undefined;
 let wsToken = "";
 const messageContainer = document.getElementById("messages");
+let usersInConvo = [];
 
 const addMessage = (messageElement) => {
   messageContainer.appendChild(messageElement);
@@ -39,7 +40,11 @@ const createNewConvo = async (username) => {
     return;
   }
 
-  return (currentConvoId = await response.text());
+  currentConvoId = await response.text();
+
+  usersInConvo = [username];
+
+  return currentConvoId;
 };
 
 const swapCurrentConvo = async (convoId) => {
@@ -151,12 +156,7 @@ const getRandomJoke = async () => {
     `${protocol}://${window.location.host}/messages`,
   );
 
-  socket.onopen = (e, ev) => {
-    console.log(e, ev);
-  };
-
-  socket.onmessage = (e, ev) => {
-    console.log(ev);
+  socket.onmessage = (e) => {
     if (typeof e.data !== "string") return;
 
     const data = JSON.parse(e.data);
@@ -187,6 +187,7 @@ const getRandomJoke = async () => {
   }
 
   currentConvoId = convos[0].convoId;
+  usersInConvo = convos[0].users;
 
   socket.send(JSON.stringify({ type: "convo", convoId: currentConvoId }));
 
@@ -209,11 +210,12 @@ const getRandomJoke = async () => {
 
     socket.send(JSON.stringify({ type: "message", message: text }));
 
-    if (!response.ok) {
-      alert("Something went wrong");
-      return;
-    }
+    addMessage(createMessageElement({ text, from: user.username }, user));
 
-    addMessage(createMessageElement({ text: text, from: user.username }, user));
+    if (!usersInConvo.filter((username) => username !== user.username).length) {
+      addMessage(
+        createMessageElement({ text, from: user.username + "Other" }, user),
+      );
+    }
   });
 })();

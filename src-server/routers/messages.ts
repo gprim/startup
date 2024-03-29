@@ -75,6 +75,6 @@ messages.get(
       user,
     );
 
-    res.send(messages);
+    res.send(messages || []);
   }),
 );
