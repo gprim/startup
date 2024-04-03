@@ -156,6 +156,12 @@ const getRandomJoke = async () => {
     `${protocol}://${window.location.host}/messages`,
   );
 
+  socket.onopen = () => {
+    if (!currentConvoId) return;
+
+    socket.send(JSON.stringify({ type: "convo", convoId: currentConvoId }));
+  };
+
   socket.onmessage = (e) => {
     if (typeof e.data !== "string") return;
 
@@ -189,7 +195,8 @@ const getRandomJoke = async () => {
   currentConvoId = convos[0].convoId;
   usersInConvo = convos[0].users;
 
-  socket.send(JSON.stringify({ type: "convo", convoId: currentConvoId }));
+  if (socket.readyState === socket.OPEN)
+    socket.send(JSON.stringify({ type: "convo", convoId: currentConvoId }));
 
   addConvos(convos, user);
   swapCurrentConvo(currentConvoId);
