@@ -1,7 +1,6 @@
 import { WebSocketServer, WebSocket, RawData } from "ws";
 import { UnauthorizedError, User } from "../authorization";
 import { UserDao } from "../dao";
-import { WebSocketHandler } from "../websocket";
 import { Message } from "./MessageTypes";
 
 type ConvoMSG = {
@@ -58,6 +57,10 @@ class WSMessageHandler {
     }
   }
 
+  constructor(user: User) {
+    this.user = user;
+  }
+
   private ws: WebSocket;
   private user: User;
   private convoId: string;
@@ -69,7 +72,16 @@ class WSMessageHandler {
       } catch (err) {
         console.log(err);
         WSMessageHandler.removeConvo(this.convoId, this.user);
-        if (this.ws) this.ws.close();
+        if (this.ws) {
+          this.ws.send(
+            JSON.stringify({
+              type: "error",
+              error: err?.message,
+              stack: err?.stack,
+            }),
+          );
+          this.ws.close();
+        }
       }
     };
   }
@@ -85,11 +97,6 @@ class WSMessageHandler {
     await UserDao.getInstance().getUsersInConvo(this.convoId, this.user);
 
     WSMessageHandler.addConvo(this.convoId, this.user, this.ws);
-  }
-
-  async tokenMsg(message: TokenMSG) {
-    const token = WebSocketHandler.getInstance().getToken(message.token);
-    this.user = await UserDao.getInstance().getUserFromToken(token);
   }
 
   async messageMsg(message: MessageMSG) {
@@ -109,6 +116,8 @@ class WSMessageHandler {
   }
 
   async onMessage(rawData: RawData) {
+    if (!this.user) throw new UnauthorizedError();
+
     const data = rawData.toString();
 
     const wsMessage: WSMessage = JSON.parse(data);
@@ -117,15 +126,10 @@ class WSMessageHandler {
       case "convo":
         await this.convoMsg(wsMessage);
         break;
-      case "token":
-        await this.tokenMsg(wsMessage);
-        break;
       case "message":
         await this.messageMsg(wsMessage);
         break;
     }
-
-    if (!this.user) throw new UnauthorizedError();
   }
 
   async onClose() {
@@ -147,8 +151,26 @@ class WSMessageHandler {
   }
 }
 
-messageWSS.on("connection", (ws) => {
-  const wsMessageHandler = new WSMessageHandler();
+messageWSS.on("connection", async (ws, req) => {
+  try {
+    const cookies = req?.headers?.cookie
+      ?.split("; ")
+      .reduce<Record<string, string>>((cookies, current) => {
+        const [name, cookie] = current.split("=");
+        cookies[name] = cookie;
+        return cookies;
+      }, {});
 
-  wsMessageHandler.onConnection(ws);
+    const token = cookies.authorization;
+
+    const user = await UserDao.getInstance().getUserFromToken(token);
+
+    const wsMessageHandler = new WSMessageHandler(user);
+
+    wsMessageHandler.onConnection(ws);
+  } catch (err) {
+    ws.send(
+      JSON.stringify({ type: "error", error: err?.message, stack: err?.stack }),
+    );
+  }
 });

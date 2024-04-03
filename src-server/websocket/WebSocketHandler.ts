@@ -2,13 +2,11 @@ import { WebSocketServer } from "ws";
 import { IncomingMessage, Server } from "http";
 import * as stream from "node:stream";
 import { UserDao } from "../dao";
-import * as crypto from "node:crypto";
 
 export class WebSocketHandler {
   private static _instance: WebSocketHandler;
 
   private servers: Record<string, WebSocketServer> = {};
-  private tokens: Record<string, string> = {};
 
   private constructor() {}
 
@@ -52,17 +50,8 @@ export class WebSocketHandler {
 
     const server = this.servers[req.url];
 
-    const token = crypto.randomUUID();
-
-    this.tokens[token] = cookies.authorization;
-
     server.handleUpgrade(req, socket, head, (ws) => {
-      server.emit("connection", ws, req, token);
-      ws.send(JSON.stringify({ token }));
+      server.emit("connection", ws, req);
     });
-  }
-
-  getToken(token: string) {
-    return this.tokens[token];
   }
 }

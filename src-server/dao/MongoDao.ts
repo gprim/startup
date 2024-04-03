@@ -187,6 +187,8 @@ export class MongoDao implements IDao {
   }
 
   async getUsersInConvo(convoId: string, user: User): Promise<string[]> {
+    if (!user || !user.username) throw new UnauthorizedError();
+
     const convo = await this.usersInConvo.findOne({ convoId });
 
     if (!convo || !convo.users.includes(user.username))

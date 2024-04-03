@@ -11,7 +11,6 @@ const createMessageElement = ({ text, from }, user) => {
 };
 
 let currentConvoId = undefined;
-let wsToken = "";
 const messageContainer = document.getElementById("messages");
 let usersInConvo = [];
 
@@ -167,20 +166,15 @@ const getRandomJoke = async () => {
 
     const data = JSON.parse(e.data);
 
-    if (!wsToken) {
-      wsToken = data.token;
-      socket.send(JSON.stringify({ type: "token", token: wsToken }));
-      return;
-    }
-
-    if (data.text) {
+    if (data?.text) {
       addMessage(createMessageElement(data, user));
+    } else if (data?.error) {
+      console.log(data);
     }
   };
 
   socket.onclose = () => {
     console.log("closed");
-    wsToken = "";
   };
 
   const response = await get("/api/messages/convo");
