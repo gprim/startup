@@ -169,6 +169,7 @@ messageWSS.on("connection", async (ws, req) => {
 
     wsMessageHandler.onConnection(ws);
   } catch (err) {
+    if (ws.readyState === ws.CLOSED || ws.readyState === ws.CLOSING) return;
     ws.send(
       JSON.stringify({ type: "error", error: err?.message, stack: err?.stack }),
     );
