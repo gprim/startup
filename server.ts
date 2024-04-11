@@ -15,9 +15,9 @@ import { messageWSS } from "./src-server/messages";
   const port = process.env.PORT || 4000;
 
   if (process.env.MONGO_USERNAME) {
-    const username = process.env.MONGO_USERNAME;
-    const password = process.env.MONGO_PASSWORD;
-    const hostname = process.env.MONGO_HOSTNAME;
+    const username: string = process.env.MONGO_USERNAME!;
+    const password: string = process.env.MONGO_PASSWORD!;
+    const hostname: string = process.env.MONGO_HOSTNAME!;
 
     const mongoDao = await MongoDao.initialize(username, password, hostname);
 
@@ -31,7 +31,7 @@ import { messageWSS } from "./src-server/messages";
   const middlewareWrapper = (middleware: MiddleWare): MiddleWare => {
     return (req, res, next) => {
       const whitelist = ["/", "/bundle.js", "/favicon.ico", "/api/auth"];
-      if (whitelist.includes(req.originalUrl)) return next();
+      if (whitelist.includes(req.originalUrl)) return next ? next() : null;
       return middleware(req, res, next);
     };
   };
@@ -43,7 +43,7 @@ import { messageWSS } from "./src-server/messages";
       return;
     }
 
-    return next();
+    return next ? next() : null;
   };
 
   const errorMiddleware = async (
