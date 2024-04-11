@@ -65,7 +65,7 @@ const addConvos = async (convos, user) => {
   for (const convo of convos) {
     const p = document.createElement("p");
     const friends = convo.users.filter(
-      (username) => username !== user.username,
+      (username) => username !== user.username
     );
 
     const convoName = friends.length ? friends.join(", ") : user.username;
@@ -129,7 +129,7 @@ const getRandomJoke = async () => {
     while (messageContainer.firstChild)
       messageContainer.removeChild(messageContainer.lastChild);
     const parentHeight = Math.floor(
-      messageContainer.parentElement.getBoundingClientRect().height - 1,
+      messageContainer.parentElement.getBoundingClientRect().height - 1
     );
 
     messageContainer.style.maxHeight = `${parentHeight}px`;
@@ -152,7 +152,7 @@ const getRandomJoke = async () => {
   const protocol = window.location.protocol === "http:" ? "ws" : "wss";
 
   const socket = new WebSocket(
-    `${protocol}://${window.location.host}/messages`,
+    `${protocol}://${window.location.host}/messages`
   );
 
   socket.onopen = () => {
@@ -215,7 +215,7 @@ const getRandomJoke = async () => {
 
     if (!usersInConvo.filter((username) => username !== user.username).length) {
       addMessage(
-        createMessageElement({ text, from: user.username + "Other" }, user),
+        createMessageElement({ text, from: user.username + "Other" }, user)
       );
     }
   });
