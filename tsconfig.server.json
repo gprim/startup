@@ -1,0 +1,23 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "target": "es2018",
+        "module": "commonjs",
+        "jsx": "react",
+        "allowSyntheticDefaultImports": true,
+        "experimentalDecorators": true,
+        "declaration": false,
+        "sourceMap": true,
+        "outDir": "./build",
+        "lib": [
+            "es2018",
+            "dom"
+        ],
+        "typeRoots": [
+            "node_modules/@types"
+        ]
+    },
+    "exclude": [
+        "node_modules/**/*"
+    ]
+}

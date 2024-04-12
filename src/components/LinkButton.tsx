@@ -9,7 +9,7 @@ type LinkButtonProps = {
 export const LinkButton = ({
   label,
   to,
-  className = "nav-button",
+  className = "link-btn",
 }: LinkButtonProps) => (
   <NavLink to={to} className={className}>
     {label}

@@ -3,19 +3,23 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { Home } from "./components/Home";
 import { AuthContextProvider } from "./context/AuthContext";
+import { Login } from "./components/Login";
+import { CreateAccount } from "./components/CreateAccounts";
 
 function App() {
   return (
     <BrowserRouter>
-      <Header />
-      <main>
-        <AuthContextProvider>
+      <AuthContextProvider>
+        <Header />
+        <main>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/create-account" element={<CreateAccount />} />
           </Routes>
-        </AuthContextProvider>
-      </main>
-      <Footer />
+        </main>
+        <Footer />
+      </AuthContextProvider>
     </BrowserRouter>
   );
 }

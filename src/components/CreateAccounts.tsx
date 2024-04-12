@@ -1,16 +1,19 @@
 import { useContext } from "react";
-import { AuthContext } from "../context";
 import { LinkButton } from "./LinkButton";
+import { AuthContext } from "../context";
 
-export const Login = () => {
-  const { login } = useContext(AuthContext);
+export const CreateAccount = () => {
+  const { createAccount } = useContext(AuthContext);
 
-  const submitLogin: React.FormEventHandler<HTMLFormElement> = async (e) => {
+  const submitCreateAccount: React.FormEventHandler<HTMLFormElement> = async (
+    e,
+  ) => {
     e.preventDefault();
     const form = new FormData(e.target as HTMLFormElement);
 
     let username = "";
     let password = "";
+    let email = "";
 
     for (const [name, value] of form.entries()) {
       switch (name) {
@@ -20,25 +23,32 @@ export const Login = () => {
         case "password":
           password = value.toString();
           break;
+        case "email":
+          email = value.toString();
+          break;
       }
     }
 
-    if (!username || !password) {
+    if (!username || !password || !email) {
       alert("You must provide a username and password");
       return;
     }
 
     username.trim();
+    email.trim();
 
     if (username.includes(" ")) {
       alert("No spaces allowed in username");
+      return;
+    } else if (email.includes(" ")) {
+      alert("No spaces allowed in email");
       return;
     }
 
     let success = false;
 
     try {
-      success = await login(username, password);
+      success = await createAccount(username, password, email);
     } catch (err) {
       console.log(err);
       alert("Something went wrong");
@@ -46,18 +56,25 @@ export const Login = () => {
     }
 
     if (success) window.location.href = window.location.origin;
-    else alert("Wrong username or password");
+    else alert("Username already taken");
   };
-
   return (
     <>
       <form
-        id="login-form"
+        id="create-account-form"
         className="session-form"
         method="get"
         action="index.html"
-        onSubmit={submitLogin}
+        onSubmit={submitCreateAccount}
       >
+        <label htmlFor="email">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          required
+          placeholder="Email"
+        />
         <label htmlFor="username">Username</label>
         <input
           type="text"
@@ -79,12 +96,8 @@ export const Login = () => {
         </button>
       </form>
       <p>
-        Don{"'"}t have an account?
-        <LinkButton
-          label="Create Account"
-          to="/create-account"
-          className="link-btn"
-        />
+        Already have an account?
+        <LinkButton label="Login" to="/login" className="link-btn" />
       </p>
     </>
   );

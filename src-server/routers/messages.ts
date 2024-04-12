@@ -9,7 +9,7 @@ const errorHandler = (middleWare: AsyncMiddleWare): AsyncMiddleWare => {
     try {
       await middleWare(req, res, next);
     } catch (err) {
-      next(err);
+      if (next) next(err);
     }
   };
 };

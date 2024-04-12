@@ -161,7 +161,9 @@ messageWSS.on("connection", async (ws, req) => {
         return cookies;
       }, {});
 
-    const token = cookies.authorization;
+    const token = cookies?.authorization;
+
+    if (!token) return;
 
     const user = await UserDao.getInstance().getUserFromToken(token);
 
