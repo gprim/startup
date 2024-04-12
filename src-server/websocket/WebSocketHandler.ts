@@ -32,7 +32,7 @@ export class WebSocketHandler {
     }
 
     const cookies = req.headers.cookie
-      .split("; ")
+      ?.split("; ")
       .reduce<Record<string, string>>((cookies, current) => {
         const [name, cookie] = current.split("=");
         cookies[name] = cookie;
@@ -40,6 +40,7 @@ export class WebSocketHandler {
       }, {});
 
     if (
+      !cookies ||
       !cookies.authorization ||
       !(await UserDao.getInstance().verifyToken(cookies.authorization))
     ) {
