@@ -7,6 +7,7 @@ import { Login } from "./components/Login";
 import { CreateAccount } from "./components/CreateAccounts";
 import { MessagePage } from "./components/messages/MessagePage";
 import { Logout } from "./components/Logout";
+import { Games } from "./components/Games";
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
             <Route path="/logout" element={<Logout />} />
             <Route path="/create-account" element={<CreateAccount />} />
             <Route path="/messages" element={<MessagePage />} />
+            <Route path="/games" element={<Games />} />
+            <Route path="*" element={<div>404 not found</div>} />
           </Routes>
         </main>
         <Footer />

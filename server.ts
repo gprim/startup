@@ -84,5 +84,5 @@ import { messageWSS } from "./src-server/messages";
 
   wsHandler.bindHttpServer(server);
 
-  wsHandler.registerWSServer("/messages", messageWSS);
+  wsHandler.registerWSServer("/messages-ws", messageWSS);
 })();

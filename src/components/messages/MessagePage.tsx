@@ -10,7 +10,7 @@ export const MessagePage = () => {
   const { user } = useContext(AuthContext);
   const { lastJsonMessage, readyState, sendJsonMessage } =
     useWebSocket<Message>(
-      `${window.location.protocol === "http:" ? "ws" : "wss"}://${window.location.host}/messages`,
+      `${window.location.protocol === "http:" ? "ws" : "wss"}://${window.location.host}/messages-ws`,
     );
 
   useEffect(() => {
