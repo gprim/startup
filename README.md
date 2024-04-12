@@ -144,3 +144,10 @@ Also, decided to change and focus exclusively on the messaging service. Games wo
  - Data sent over WebSocket connection: Done!
  - Websocket data displayed: When a message is sent, it will display on the user who it was sent to's screen
  
+ ### React deliverable
+
+ - Bundled and transpiled: Been doing that for a while, but Done!
+ - Components: Login, Logout, Games, MessagePage, Messages, FriendList... so yes
+ - Router: Routing between login pages, game page and message page
+ - Hooks: Extensive use of useState, useContext, some useRef, and even a useWebsocket
+ 
