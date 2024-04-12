@@ -5,6 +5,8 @@ import { Home } from "./components/Home";
 import { AuthContextProvider } from "./context/AuthContext";
 import { Login } from "./components/Login";
 import { CreateAccount } from "./components/CreateAccounts";
+import { MessagePage } from "./components/messages/MessagePage";
+import { Logout } from "./components/Logout";
 
 function App() {
   return (
@@ -15,7 +17,9 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/logout" element={<Logout />} />
             <Route path="/create-account" element={<CreateAccount />} />
+            <Route path="/messages" element={<MessagePage />} />
           </Routes>
         </main>
         <Footer />

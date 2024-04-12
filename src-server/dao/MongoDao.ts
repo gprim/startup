@@ -71,11 +71,12 @@ export class MongoDao implements IDao {
   }
 
   private removeId<T>(value: WithId<T>): T {
-    delete value._id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (value as any)._id;
     return value as T;
   }
 
-  async getUser(username: string): Promise<User> {
+  async getUser(username: string) {
     const user = await this.users.findOne({ username });
     if (!user) return undefined;
     return this.removeId(user);
@@ -110,7 +111,7 @@ export class MongoDao implements IDao {
     return token;
   }
 
-  async verifyToken(token: string): Promise<string> {
+  async verifyToken(token: string) {
     const tokenPair = await this.tokens.findOne({ token });
     return tokenPair?.username;
   }
@@ -119,7 +120,7 @@ export class MongoDao implements IDao {
     await this.tokens.deleteOne({ token });
   }
 
-  async getUserFromToken(token: string): Promise<User> {
+  async getUserFromToken(token: string): Promise<User | undefined> {
     const username = await this.verifyToken(token);
     if (!username) return undefined;
     const user = await this.getUser(username);
@@ -140,7 +141,7 @@ export class MongoDao implements IDao {
       .project<Partial<User>>(projection)
       .toArray();
 
-    return partialUsers.map((user) => user.username);
+    return partialUsers.map((user) => user.username!);
   }
 
   async createConvo(users: string[]): Promise<string> {
@@ -227,9 +228,9 @@ export class MongoDao implements IDao {
 
     const convo = await this.messages.findOne({ convoId });
 
-    if (!convo) return undefined;
+    if (!convo) return [];
 
-    const messages = [];
+    const messages: Message[] = [];
 
     for (const message of convo.messages) {
       if (message.timestamp <= before) continue;

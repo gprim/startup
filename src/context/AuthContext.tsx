@@ -66,15 +66,23 @@ export const AuthContextProvider = ({ children }: AuthContextProps) => {
 
     if (!ok) return false;
 
-    let storedUser = LocalStorage.get<User>(LocalStorageKeys.USER);
+    const user = { username, password };
 
-    if (!storedUser)
-      LocalStorage.store(
-        LocalStorageKeys.USER,
-        (storedUser = { username, password }),
-      );
+    LocalStorage.store(LocalStorageKeys.USER, user);
 
-    setAuthState((prevState) => ({ ...prevState, user: storedUser }));
+    setAuthState((prevState) => ({ ...prevState, user }));
+
+    return true;
+  };
+
+  const logout = async () => {
+    const { ok } = await Api.delete("/api/auth");
+
+    if (!ok) return false;
+
+    LocalStorage.store(LocalStorageKeys.USER, "");
+
+    setAuthState((prevState) => ({ ...prevState, user: undefined }));
 
     return true;
   };
@@ -83,7 +91,7 @@ export const AuthContextProvider = ({ children }: AuthContextProps) => {
     user: authState.user,
     createAccount,
     login,
-    logout: async () => false,
+    logout,
   };
 
   return (

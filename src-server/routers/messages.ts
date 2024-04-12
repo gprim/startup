@@ -1,6 +1,7 @@
 import * as express from "express";
 import { AsyncMiddleWare } from "./ApiTypes";
 import { UserDao } from "../dao";
+import { UnauthorizedError } from "../authorization";
 
 export const messages = express.Router();
 
@@ -21,8 +22,10 @@ messages.post(
     const token = req.cookies?.authorization;
 
     const user1 = (await UserDao.getInstance().getUserFromToken(token))
-      .username;
+      ?.username;
     const user2 = req.params.username;
+
+    if (!user1) throw new UnauthorizedError();
 
     const convoId = await UserDao.getInstance().createConvo([user1, user2]);
 
@@ -47,6 +50,8 @@ messages.get(
     const username = (await UserDao.getInstance().getUserFromToken(token))
       ?.username;
 
+    if (!username) throw new UnauthorizedError();
+
     const now = Date.now();
 
     const convos = await UserDao.getInstance().getUserConvos(username, [
@@ -66,6 +71,8 @@ messages.get(
     const token = req.cookies?.authorization;
 
     const user = await UserDao.getInstance().getUserFromToken(token);
+
+    if (!user) throw new UnauthorizedError();
 
     const now = Date.now();
 

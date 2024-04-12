@@ -16,6 +16,7 @@ type TokenMSG = {
 type MessageMSG = {
   type: "message";
   message: string;
+  convoId: string;
 };
 
 type WSMessage = ConvoMSG | TokenMSG | MessageMSG;
@@ -71,7 +72,6 @@ class WSMessageHandler {
         await func(rawData);
       } catch (err) {
         console.log(err);
-        WSMessageHandler.removeConvo(this.convoId, this.user);
         if (this.ws) {
           this.ws.send(
             JSON.stringify({
@@ -80,13 +80,12 @@ class WSMessageHandler {
               stack: err?.stack,
             }),
           );
-          this.ws.close();
         }
       }
     };
   }
 
-  async convoMsg(message: ConvoMSG) {
+  async convoMsg(message: ConvoMSG | MessageMSG) {
     if (this.convoId) {
       WSMessageHandler.removeConvo(this.convoId, this.user);
     }
@@ -100,6 +99,8 @@ class WSMessageHandler {
   }
 
   async messageMsg(message: MessageMSG) {
+    if (this.convoId !== message.convoId) await this.convoMsg(message);
+
     const userMessage: Message = {
       text: message.message,
       from: this.user.username,
@@ -166,6 +167,8 @@ messageWSS.on("connection", async (ws, req) => {
     if (!token) return;
 
     const user = await UserDao.getInstance().getUserFromToken(token);
+
+    if (!user) return;
 
     const wsMessageHandler = new WSMessageHandler(user);
 
